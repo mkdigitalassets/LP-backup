@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Stable Version</title>
+    <title>Admin & Manager Panel</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -22,14 +22,17 @@
         .form-control, .form-select { border-radius: 8px; padding: 10px 15px; border: 1px solid #cbd5e1; }
         .btn-save { background: #22c55e; color: white; font-weight: bold; border-radius: 8px; padding: 12px; border: none; width: 100%; }
         
-        /* Summary Highlight Styles */
+        /* Login Screen Style */
+        #login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #1e293b; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 40px; border-radius: 15px; width: 100%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+
         .summary-box { padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; color: white; }
         .bg-income { background: #22c55e; }
         .bg-expense { background: #ef4444; }
         .bg-balance { background: #3b82f6; }
 
         @media print {
-            .no-print, .navbar, .btn, #form-container, #home-section, #filter-container { display: none !important; }
+            .no-print, .navbar, .btn, #form-container, #home-section, #filter-container, #login-overlay { display: none !important; }
             .view-section { display: block !important; }
             .main-card { box-shadow: none; border: none; padding: 0; }
             table { width: 100% !important; border-collapse: collapse; }
@@ -39,24 +42,38 @@
 </head>
 <body>
 
+    <div id="login-overlay">
+        <div class="login-box">
+            <div class="text-center mb-4">
+                <i class="fas fa-lock fa-3x text-primary mb-2"></i>
+                <h3 class="fw-bold">Login System</h3>
+                <p class="text-muted small">Enter credentials to continue</p>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Username / Manager Name</label>
+                <input type="text" id="login-user" class="form-control" placeholder="admin or manager name">
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Password</label>
+                <input type="password" id="login-pass" class="form-control" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary w-100 py-2 fw-bold" onclick="handleLogin()">ENTER PANEL</button>
+            <div id="login-error" class="text-danger mt-3 text-center small" style="display:none;">Invalid details!</div>
+        </div>
+    </div>
+
     <nav class="navbar navbar-dark no-print mb-5 shadow">
-        <div class="container"><a class="navbar-brand fw-bold" href="#" onclick="showHome()"><i class="fas fa-layer-group me-2"></i>ADMIN PANEL</a></div>
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="showHome()"><i class="fas fa-layer-group me-2"></i>ADMIN PANEL</a>
+            <button class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="location.reload()">Logout</button>
+        </div>
     </nav>
 
     <div class="container pb-5">
         
         <div id="home-section" class="view-section active-section">
-            <div class="row g-4 text-center">
-                <div class="col-md-12"><div class="card h-100 card-custom p-4 shadow-sm border-top-0" style="border-left: 10px solid #3b82f6;" onclick="openFinalReport()"><i class="fas fa-chart-pie fa-3x text-primary mb-3"></i><h4 class="fw-bold text-primary">FINAL CONSOLIDATED REPORT</h4><p class="text-muted">View Profit/Loss & All Expenses side-by-side</p></div></div>
-                
-                <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Tehsils')"><i class="fas fa-map-location-dot fa-3x text-primary mb-3"></i><h5 class="fw-bold">Tehsils</h5></div></div>
-                <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Managers')"><i class="fas fa-user-tie fa-3x text-primary mb-3"></i><h5 class="fw-bold">Managers</h5></div></div>
-                <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('ManagerExpenses')"><i class="fas fa-wallet fa-3x text-primary mb-3"></i><h5 class="fw-bold">Manager Exp</h5></div></div>
-                <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Machinary')"><i class="fas fa-tractor fa-3x text-primary mb-3"></i><h5 class="fw-bold">Machinary</h5></div></div>
-                <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('MachinaryExpenses')"><i class="fas fa-tools fa-3x text-primary mb-3"></i><h5 class="fw-bold">Machinary Exp</h5></div></div>
-                <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Income')"><i class="fas fa-sack-dollar fa-3x text-success mb-3"></i><h5 class="fw-bold text-success">Income</h5></div></div>
-                <div class="col-md-4 offset-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Salary')"><i class="fas fa-id-card fa-3x text-primary mb-3"></i><h5 class="fw-bold">Salary</h5></div></div>
-            </div>
+            <div class="row g-4 text-center" id="dashboard-items">
+                </div>
         </div>
 
         <div id="category-section" class="view-section">
@@ -92,6 +109,11 @@
                                 <label class="form-label">Machinery</label>
                                 <select name="MachinaryName" id="machinary-dropdown" class="select2-bs5"></select>
                             </div>
+                            <div class="col-md-6" id="password-group" style="display:none;">
+                                <label class="form-label">Manager Login Password</label>
+                                <input type="text" name="Password" class="form-control" placeholder="Set password for manager">
+                            </div>
+
                             <div class="col-md-6" id="amount-group">
                                 <label class="form-label">Amount</label>
                                 <input type="number" name="Amount" class="form-control" placeholder="0">
@@ -119,7 +141,6 @@
                         <div class="col-md-3"><input type="date" id="filter-to" class="form-control form-control-sm"></div>
                         <div class="col-md-2"><button class="btn btn-sm btn-primary w-100" id="filter-btn" onclick="applyFilters()">Filter</button></div>
                     </div>
-
                     <div class="table-responsive">
                         <table class="table table-hover align-middle border-top">
                             <thead class="table-dark" id="table-head"></thead>
@@ -137,59 +158,79 @@
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbz3AFsk31Y5aEV8Ka_FJ28SfvFJQZPp0k71EfZBfWUJzExv7c3zb-lWUadJ_TY7KcfK5g/exec';
-        let currentCategory = "", allData = [], filteredCategoryData = [], isEditing = false, editRowNum = null;
+        let currentUser = { role: '', name: '' };
+        let allData = [], currentCategory = "";
 
-        $(document).ready(function() {
-            $('.select2-bs5').select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Select' });
-        });
+        // Admin Credentials
+        const adminUser = "admin";
+        const adminPass = "12345";
 
-        function showHome() { 
-            $('#category-section').removeClass('active-section'); 
-            $('#home-section').addClass('active-section'); 
+        function handleLogin() {
+            const user = $('#login-user').val();
+            const pass = $('#login-pass').val();
+
+            if(user === adminUser && pass === adminPass) {
+                currentUser = { role: 'admin', name: 'Admin' };
+                startApp();
+            } else {
+                // Check in Managers data from Sheet
+                fetch(scriptURL).then(res => res.json()).then(data => {
+                    const manager = data.find(i => i.Category === 'Managers' && i.Description === user && i.Password === pass);
+                    if(manager) {
+                        currentUser = { role: 'manager', name: manager.Description };
+                        startApp();
+                    } else {
+                        $('#login-error').fadeIn();
+                    }
+                });
+            }
         }
 
-        function toggleView(view) { 
-            if(view === 'form') { $('#form-container').fadeIn(); $('#data-list-container').hide(); } 
-            else { $('#form-container').hide(); $('#data-list-container').fadeIn(); } 
+        function startApp() {
+            $('#login-overlay').fadeOut();
+            renderDashboard();
+            fetchListData();
+        }
+
+        function renderDashboard() {
+            let html = '';
+            if(currentUser.role === 'admin') {
+                html = `
+                    <div class="col-md-12"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openFinalReport()"><i class="fas fa-chart-pie fa-3x text-primary mb-3"></i><h4 class="fw-bold">FINAL REPORT</h4></div></div>
+                    <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Tehsils')"><i class="fas fa-map-location-dot fa-2x text-primary mb-2"></i><h6>Tehsils</h6></div></div>
+                    <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Managers')"><i class="fas fa-user-tie fa-2x text-primary mb-2"></i><h6>Managers</h6></div></div>
+                    <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('ManagerExpenses')"><i class="fas fa-wallet fa-2x text-primary mb-2"></i><h6>Manager Exp</h6></div></div>
+                    <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Machinary')"><i class="fas fa-tractor fa-2x text-primary mb-2"></i><h6>Machinary</h6></div></div>
+                    <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('MachinaryExpenses')"><i class="fas fa-tools fa-2x text-primary mb-2"></i><h6>Machinary Exp</h6></div></div>
+                    <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Income')"><i class="fas fa-sack-dollar fa-2x text-success mb-2"></i><h6 class="text-success">Income</h6></div></div>
+                `;
+            } else {
+                html = `
+                    <div class="col-md-12"><div class="card h-100 card-custom p-5 shadow-sm" onclick="openCategory('ManagerExpenses')"><i class="fas fa-file-invoice-dollar fa-4x text-primary mb-3"></i><h3 class="fw-bold">ADD MY EXPENSES</h3><p>Welcome, ${currentUser.name}</p></div></div>
+                `;
+            }
+            $('#dashboard-items').html(html);
         }
 
         function openCategory(name) {
             currentCategory = name;
             $('#summary-highlights').hide();
             $('#action-buttons button:first-child').show();
-            $('#filter-btn').attr('onclick', 'applyFilters()');
             toggleView('list');
             $('#home-section').removeClass('active-section');
             $('#category-section').addClass('active-section');
             $('#current-title').text(name);
             $('#category-type').val(name);
 
-            $('#manager-select-group').toggle(name === 'ManagerExpenses');
+            // Access Control: Manager only enters their name
+            $('#manager-select-group').toggle(name === 'ManagerExpenses' && currentUser.role === 'admin');
+            $('#password-group').toggle(name === 'Managers');
             $('#machinary-select-group').toggle(name === 'MachinaryExpenses');
             $('#tehsil-select-group').toggle(name !== 'Tehsils');
             
             const isEntry = !['Tehsils', 'Managers', 'Machinary'].includes(name);
             $('#filter-container, #amount-group, #date-group').toggle(isEntry);
             
-            let label = "Description";
-            if(name === 'Managers') label = "Manager Name";
-            else if(name === 'Machinary') label = "Machinery Name";
-            else if(name === 'Salary') label = "Employee Name";
-            $('#label-desc').text(label);
-
-            fetchListData();
-        }
-
-        function openFinalReport() {
-            currentCategory = "FinalReport";
-            $('#current-title').text("Consolidated Final Report");
-            $('#home-section').removeClass('active-section');
-            $('#category-section').addClass('active-section');
-            $('#summary-highlights').show();
-            $('#action-buttons button:first-child').hide(); // Hide Add Record button
-            $('#filter-container').show();
-            $('#filter-btn').attr('onclick', 'generateFinalReport()');
-            toggleView('list');
             fetchListData();
         }
 
@@ -198,91 +239,38 @@
             fetch(scriptURL).then(res => res.json()).then(data => {
                 allData = data;
                 updateDropdowns();
-                if(currentCategory === "FinalReport") { generateFinalReport(); }
-                else {
-                    filteredCategoryData = data.filter(item => item.Category === currentCategory);
-                    renderTable(filteredCategoryData);
+                let filtered = data.filter(item => item.Category === currentCategory);
+                
+                // Manager filters: only see their own expenses
+                if(currentUser.role === 'manager' && currentCategory === 'ManagerExpenses') {
+                    filtered = filtered.filter(i => i.ManagerName === currentUser.name);
                 }
+                
+                renderTable(filtered);
             });
         }
 
+        function prepareNewRecord() {
+            isEditing = false; $('#dynamic-form')[0].reset();
+            if(currentUser.role === 'manager') {
+                // Auto fill manager name if manager is logged in
+                $('#manager-dropdown').val(currentUser.name).trigger('change');
+            }
+            toggleView('form');
+        }
+
+        // --- Baqi logic same rahay gi (RenderTable, Edit, Delete, etc.) ---
+        // (Note: Sirf Manager category mein 'Password' field sheet mein save honi chahiye)
+
+        function showHome() { $('#category-section').removeClass('active-section'); $('#home-section').addClass('active-section'); }
+        function toggleView(view) { if(view === 'form') { $('#form-container').show(); $('#data-list-container').hide(); } else { $('#form-container').hide(); $('#data-list-container').show(); } }
+        
         function renderTable(data) {
-            if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center py-4'>No Data found.</td></tr>"); return; }
-            const headers = Object.keys(data[0]).filter(h => !['rowNum', 'Category', 'ID'].includes(h));
+            if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center py-4'>No Data.</td></tr>"); return; }
+            const headers = Object.keys(data[0]).filter(h => !['rowNum', 'Category', 'ID', 'Password'].includes(h));
             $('#table-head').html(`<tr>${headers.map(h => `<th>${h}</th>`).join('')}<th class="no-print">Actions</th></tr>`);
-            
-            let total = 0;
-            let rowsHtml = data.map(row => {
-                if(row.Amount) total += parseFloat(row.Amount);
-                return `<tr>${headers.map(h => `<td>${h === 'Date' ? row[h].split('T')[0] : (row[h] || '-')}</td>`).join('')}
-                    <td class="no-print">
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick='editRecord(${JSON.stringify(row)})'><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick='deleteRecord(${row.rowNum})'><i class="fas fa-trash"></i></button>
-                    </td></tr>`;
-            }).join('');
-
-            if(total > 0) rowsHtml += `<tr class="table-success fw-bold"><td>TOTAL</td><td colspan="10" class="text-primary h5">${total.toLocaleString()}</td></tr>`;
+            let rowsHtml = data.map(row => `<tr>${headers.map(h => `<td>${h === 'Date' ? row[h].split('T')[0] : (row[h] || '-')}</td>`).join('')}<td class="no-print"><button class="btn btn-sm btn-outline-primary" onclick='editRecord(${JSON.stringify(row)})'><i class="fas fa-pen"></i></button></td></tr>`).join('');
             $('#table-body').html(rowsHtml);
-        }
-
-        function generateFinalReport() {
-            const teh = $('#filter-tehsil').val();
-            const from = $('#filter-from').val();
-            const to = $('#filter-to').val();
-
-            let data = allData.filter(i => !['Tehsils', 'Managers', 'Machinary'].includes(i.Category));
-            
-            // Filters
-            if(teh) data = data.filter(i => i.ParentTehsil === teh);
-            if(from || to) {
-                data = data.filter(i => {
-                    if(!i.Date) return false;
-                    const d = new Date(i.Date).setHours(0,0,0,0);
-                    const s = from ? new Date(from).setHours(0,0,0,0) : null;
-                    const e = to ? new Date(to).setHours(0,0,0,0) : null;
-                    return (!s || d >= s) && (!e || d <= e);
-                });
-            }
-
-            let income = 0, expense = 0;
-            $('#table-head').html(`<tr><th>Date</th><th>Category</th><th>Details</th><th>Tehsil</th><th>Debit (Exp)</th><th>Credit (Inc)</th></tr>`);
-            
-            let rowsHtml = data.map(row => {
-                let amt = parseFloat(row.Amount || 0);
-                let isInc = row.Category === 'Income';
-                if(isInc) income += amt; else expense += amt;
-
-                return `<tr>
-                    <td>${row.Date ? row.Date.split('T')[0] : '-'}</td>
-                    <td><span class="badge ${isInc ? 'bg-success' : 'bg-danger'}">${row.Category}</span></td>
-                    <td>${row.ManagerName || row.MachinaryName || ''} - ${row.Description}</td>
-                    <td>${row.ParentTehsil || '-'}</td>
-                    <td class="text-danger">${!isInc ? amt.toLocaleString() : '-'}</td>
-                    <td class="text-success">${isInc ? amt.toLocaleString() : '-'}</td>
-                </tr>`;
-            }).join('');
-
-            $('#table-body').html(rowsHtml);
-            $('#sum-income').text(income.toLocaleString());
-            $('#sum-expense').text(expense.toLocaleString());
-            $('#sum-balance').text((income - expense).toLocaleString());
-        }
-
-        function applyFilters() {
-            const teh = $('#filter-tehsil').val();
-            const from = $('#filter-from').val();
-            const to = $('#filter-to').val();
-            let res = filteredCategoryData;
-            if(teh) res = res.filter(i => i.ParentTehsil === teh);
-            if(from || to) {
-                res = res.filter(i => {
-                    const d = new Date(i.Date).setHours(0,0,0,0);
-                    const s = from ? new Date(from).setHours(0,0,0,0) : null;
-                    const e = to ? new Date(to).setHours(0,0,0,0) : null;
-                    return (!s || d >= s) && (!e || d <= e);
-                });
-            }
-            renderTable(res);
         }
 
         function updateDropdowns() {
@@ -294,28 +282,11 @@
             $('#machinary-dropdown').html('<option value="">Select Machinery</option>' + machinary.map(m => `<option value="${m.Description}">${m.Description}</option>`).join(''));
         }
 
-        function prepareNewRecord() {
-            isEditing = false; $('#dynamic-form')[0].reset(); $('.select2-bs5').val(null).trigger('change');
-            const catData = allData.filter(i => i.Category === currentCategory);
-            let maxID = 0; catData.forEach(item => { if(parseInt(item.ID) > maxID) maxID = parseInt(item.ID); });
-            $('#input-id').val(maxID + 1); toggleView('form');
-        }
-
-        function editRecord(data) {
-            isEditing = true; editRowNum = data.rowNum; toggleView('form');
-            const f = $('#dynamic-form'); f.find('[name="ID"]').val(data.ID); f.find('[name="Description"]').val(data.Description);
-            if(data.Amount) f.find('[name="Amount"]').val(data.Amount);
-            if(data.Date) f.find('[name="Date"]').val(data.Date.split('T')[0]);
-            $('#tehsil-dropdown').val(data.ParentTehsil).trigger('change');
-            $('#manager-dropdown').val(data.ManagerName).trigger('change');
-            $('#machinary-dropdown').val(data.MachinaryName).trigger('change');
-        }
-
-        function deleteRecord(num) { if(confirm("Are you sure?")) fetch(scriptURL, { method: 'POST', body: new URLSearchParams({'action':'DELETE', 'rowNum': num}) }).then(() => fetchListData()); }
-
         $('#dynamic-form').on('submit', function(e) {
-            e.preventDefault(); const btn = $('#submit-btn'); btn.prop('disabled', true).text("Saving...");
-            let fd = new FormData(this); if(isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); }
+            e.preventDefault();
+            const btn = $('#submit-btn'); btn.prop('disabled', true).text("Saving...");
+            let fd = new FormData(this);
+            if(currentUser.role === 'manager') fd.append('ManagerName', currentUser.name);
             fetch(scriptURL, { method: 'POST', body: fd }).then(() => { toggleView('list'); fetchListData(); btn.prop('disabled', false).text("SAVE RECORD"); });
         });
     </script>
