@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Machinary & Expenses</title>
+    <title>Admin Panel - Complete ERP</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -18,12 +18,11 @@
         .card-custom:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
         .view-section { display: none; }
         .active-section { display: block; }
-        .form-label { font-weight: 600; color: #334155; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-label { font-weight: 600; color: #334155; font-size: 0.85rem; text-transform: uppercase; }
         .form-control, .form-select { border-radius: 8px; padding: 10px 15px; border: 1px solid #cbd5e1; }
-        .input-group-text { background-color: #f8fafc; border-color: #cbd5e1; color: #64748b; }
-        .btn-save { background: #22c55e; color: white; font-weight: bold; border-radius: 8px; padding: 12px; border: none; transition: 0.3s; width: 100%; }
-        .btn-save:hover { background: #16a34a; transform: scale(1.01); }
-
+        .input-group-text { background-color: #f8fafc; color: #64748b; }
+        .btn-save { background: #22c55e; color: white; font-weight: bold; border-radius: 8px; padding: 12px; border: none; width: 100%; }
+        
         @media print {
             .no-print, .navbar, .btn, #form-container, #home-section, #filter-container { display: none !important; }
             .view-section { display: block !important; }
@@ -36,9 +35,7 @@
 <body>
 
     <nav class="navbar navbar-dark no-print mb-5 shadow">
-        <div class="container text-center">
-            <a class="navbar-brand fw-bold" href="#" onclick="showHome()"><i class="fas fa-cogs me-2"></i>ENGINEERING MANAGEMENT</a>
-        </div>
+        <div class="container"><a class="navbar-brand fw-bold" href="#" onclick="showHome()"><i class="fas fa-building-columns me-2"></i>ADMIN SYSTEM</a></div>
     </nav>
 
     <div class="container pb-5">
@@ -50,6 +47,7 @@
                 <div class="col-md-4"><div class="card h-100 card-custom text-center p-4 shadow-sm" onclick="openCategory('ManagerExpenses')"><i class="fas fa-wallet fa-3x text-primary mb-3"></i><h5 class="fw-bold">Manager Exp</h5></div></div>
                 <div class="col-md-4"><div class="card h-100 card-custom text-center p-4 shadow-sm" onclick="openCategory('Machinary')"><i class="fas fa-tractor fa-3x text-primary mb-3"></i><h5 class="fw-bold">Machinary</h5></div></div>
                 <div class="col-md-4"><div class="card h-100 card-custom text-center p-4 shadow-sm" onclick="openCategory('MachinaryExpenses')"><i class="fas fa-tools fa-3x text-primary mb-3"></i><h5 class="fw-bold">Machinary Exp</h5></div></div>
+                <div class="col-md-4"><div class="card h-100 card-custom text-center p-4 shadow-sm" onclick="openCategory('Income')"><i class="fas fa-coins fa-3x text-success mb-3"></i><h5 class="fw-bold text-success">Income</h5></div></div>
                 <div class="col-md-4"><div class="card h-100 card-custom text-center p-4 shadow-sm" onclick="openCategory('Salary')"><i class="fas fa-credit-card fa-3x text-primary mb-3"></i><h5 class="fw-bold">Salary</h5></div></div>
             </div>
         </div>
@@ -72,54 +70,36 @@
                         <div class="row g-4">
                             <div class="col-md-6" id="tehsil-select-group">
                                 <label class="form-label">Tehsil</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-map-pin"></i></span>
-                                    <select name="ParentTehsil" id="tehsil-dropdown" class="select2-bs5"></select>
-                                </div>
+                                <div class="input-group"><span class="input-group-text"><i class="fas fa-map-pin"></i></span><select name="ParentTehsil" id="tehsil-dropdown" class="select2-bs5"></select></div>
                             </div>
 
                             <div class="col-md-6" id="manager-select-group" style="display:none;">
                                 <label class="form-label">Manager</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                    <select name="ManagerName" id="manager-dropdown" class="select2-bs5"></select>
-                                </div>
+                                <div class="input-group"><span class="input-group-text"><i class="fas fa-user"></i></span><select name="ManagerName" id="manager-dropdown" class="select2-bs5"></select></div>
                             </div>
 
                             <div class="col-md-6" id="machinary-select-group" style="display:none;">
-                                <label class="form-label">Select Machinary</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-truck-pickup"></i></span>
-                                    <select name="MachinaryName" id="machinary-dropdown" class="select2-bs5"></select>
-                                </div>
+                                <label class="form-label">Machinary</label>
+                                <div class="input-group"><span class="input-group-text"><i class="fas fa-truck-pickup"></i></span><select name="MachinaryName" id="machinary-dropdown" class="select2-bs5"></select></div>
                             </div>
 
                             <div class="col-md-6" id="amount-group">
                                 <label class="form-label">Amount</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rs.</span>
-                                    <input type="number" name="Amount" class="form-control">
-                                </div>
+                                <div class="input-group"><span class="input-group-text fw-bold">Rs.</span><input type="number" name="Amount" class="form-control"></div>
                             </div>
 
                             <div class="col-md-6" id="date-group">
                                 <label class="form-label">Date</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                                    <input type="date" name="Date" class="form-control">
-                                </div>
+                                <div class="input-group"><span class="input-group-text"><i class="fas fa-calendar"></i></span><input type="date" name="Date" class="form-control"></div>
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label" id="label-desc">Description</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
-                                    <input type="text" name="Description" class="form-control" required>
-                                </div>
+                                <input type="text" name="Description" class="form-control" required>
                             </div>
 
                             <div class="col-12 text-center">
-                                <button type="submit" class="btn btn-save shadow-sm" id="submit-btn"><i class="fas fa-save me-2"></i>SAVE RECORD</button>
+                                <button type="submit" class="btn btn-save shadow-sm" id="submit-btn">SAVE RECORD</button>
                                 <button type="button" class="btn btn-link text-danger mt-2" onclick="toggleView('list')">Cancel</button>
                             </div>
                         </div>
@@ -136,7 +116,7 @@
 
                     <div class="table-responsive">
                         <table class="table table-hover align-middle border-top">
-                            <thead class="table-light text-secondary" id="table-head"></thead>
+                            <thead class="table-dark" id="table-head"></thead>
                             <tbody id="table-body"></tbody>
                         </table>
                     </div>
@@ -154,15 +134,11 @@
         let currentCategory = "", allData = [], filteredCategoryData = [], isEditing = false, editRowNum = null;
 
         $(document).ready(function() {
-            $('.select2-bs5').select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Choose...' });
+            $('.select2-bs5').select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Select' });
         });
 
         function showHome() { $('#category-section').removeClass('active-section'); $('#home-section').addClass('active-section'); }
-
-        function toggleView(view) {
-            if(view === 'form') { $('#form-container').fadeIn(); $('#data-list-container').hide(); }
-            else { $('#form-container').hide(); $('#data-list-container').fadeIn(); }
-        }
+        function toggleView(view) { if(view === 'form') { $('#form-container').show(); $('#data-list-container').hide(); } else { $('#form-container').hide(); $('#data-list-container').show(); } }
 
         function openCategory(name) {
             currentCategory = name;
@@ -172,14 +148,15 @@
             $('#current-title').text(name);
             $('#category-type').val(name);
 
-            // Visibility Logic
+            // Field Logic (Added Income here)
             $('#manager-select-group').toggle(name === 'ManagerExpenses');
             $('#machinary-select-group').toggle(name === 'MachinaryExpenses');
             $('#tehsil-select-group').toggle(name !== 'Tehsils');
-            $('#filter-container').toggle(!['Tehsils', 'Managers', 'Machinary'].includes(name));
-            $('#amount-group, #date-group').toggle(!['Tehsils', 'Managers', 'Machinary'].includes(name));
             
-            // Label Logic
+            // Amount/Date filters (Now includes Income)
+            const isEntryType = !['Tehsils', 'Managers', 'Machinary'].includes(name);
+            $('#filter-container, #amount-group, #date-group').toggle(isEntryType);
+            
             let label = "Description";
             if(name === 'Managers') label = "Manager Name";
             else if(name === 'Machinary') label = "Machinery Name";
@@ -207,13 +184,11 @@
             let total = 0;
             let rowsHtml = data.map(row => {
                 if(row.Amount) total += parseFloat(row.Amount);
-                return `<tr>
-                    ${headers.map(h => `<td>${h === 'Date' ? row[h].split('T')[0] : (row[h] || '-')}</td>`).join('')}
+                return `<tr>${headers.map(h => `<td>${h === 'Date' ? row[h].split('T')[0] : (row[h] || '-')}</td>`).join('')}
                     <td class="no-print">
                         <button class="btn btn-sm btn-outline-primary me-1" onclick='editRecord(${JSON.stringify(row)})'><i class="fas fa-pen"></i></button>
                         <button class="btn btn-sm btn-outline-danger" onclick='deleteRecord(${row.rowNum})'><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>`;
+                    </td></tr>`;
             }).join('');
 
             if(total > 0) rowsHtml += `<tr class="table-success fw-bold"><td>TOTAL</td><td colspan="10" class="text-primary h5">${total.toLocaleString()}</td></tr>`;
@@ -241,42 +216,33 @@
             const tehsils = allData.filter(i => i.Category === 'Tehsils');
             const managers = allData.filter(i => i.Category === 'Managers');
             const machinary = allData.filter(i => i.Category === 'Machinary');
-
             $('#tehsil-dropdown, #filter-tehsil').html('<option value="">Select Tehsil</option>' + tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join(''));
             $('#manager-dropdown').html('<option value="">Select Manager</option>' + managers.map(m => `<option value="${m.Description}">${m.Description}</option>`).join(''));
             $('#machinary-dropdown').html('<option value="">Select Machinary</option>' + machinary.map(m => `<option value="${m.Description}">${m.Description}</option>`).join(''));
         }
 
         function prepareNewRecord() {
-            isEditing = false; $('#dynamic-form')[0].reset();
-            $('.select2-bs5').val(null).trigger('change');
+            isEditing = false; $('#dynamic-form')[0].reset(); $('.select2-bs5').val(null).trigger('change');
             const catData = allData.filter(i => i.Category === currentCategory);
-            let maxID = 0;
-            catData.forEach(item => { if(parseInt(item.ID) > maxID) maxID = parseInt(item.ID); });
-            $('#input-id').val(maxID + 1);
-            toggleView('form');
+            let maxID = 0; catData.forEach(item => { if(parseInt(item.ID) > maxID) maxID = parseInt(item.ID); });
+            $('#input-id').val(maxID + 1); toggleView('form');
         }
 
         function editRecord(data) {
-            isEditing = true; editRowNum = data.rowNum;
-            const f = $('#dynamic-form');
-            f.find('[name="ID"]').val(data.ID);
-            f.find('[name="Description"]').val(data.Description);
+            isEditing = true; editRowNum = data.rowNum; toggleView('form');
+            const f = $('#dynamic-form'); f.find('[name="ID"]').val(data.ID); f.find('[name="Description"]').val(data.Description);
             if(data.Amount) f.find('[name="Amount"]').val(data.Amount);
             if(data.Date) f.find('[name="Date"]').val(data.Date.split('T')[0]);
             $('#tehsil-dropdown').val(data.ParentTehsil).trigger('change');
             $('#manager-dropdown').val(data.ManagerName).trigger('change');
             $('#machinary-dropdown').val(data.MachinaryName).trigger('change');
-            toggleView('form');
         }
 
-        function deleteRecord(num) { if(confirm("Confirm Delete?")) fetch(scriptURL, { method: 'POST', body: new URLSearchParams({'action':'DELETE', 'rowNum': num}) }).then(() => fetchListData()); }
+        function deleteRecord(num) { if(confirm("Delete this?")) fetch(scriptURL, { method: 'POST', body: new URLSearchParams({'action':'DELETE', 'rowNum': num}) }).then(() => fetchListData()); }
 
         $('#dynamic-form').on('submit', function(e) {
-            e.preventDefault();
-            const btn = $('#submit-btn'); btn.prop('disabled', true).text("Saving...");
-            let fd = new FormData(this);
-            if(isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); }
+            e.preventDefault(); const btn = $('#submit-btn'); btn.prop('disabled', true).text("Saving...");
+            let fd = new FormData(this); if(isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); }
             fetch(scriptURL, { method: 'POST', body: fd }).then(() => { toggleView('list'); fetchListData(); btn.prop('disabled', false).text("SAVE RECORD"); });
         });
     </script>
