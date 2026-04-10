@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Pro Version</title>
+    <title>Admin Panel - Final Fixed Version</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -15,25 +15,22 @@
         .navbar { background-color: #1e293b !important; }
         .card-custom { 
             transition: all 0.3s ease; 
-            border: none; 
-            border-top: 5px solid #3b82f6;
-            cursor: pointer;
-            border-radius: 12px;
+            border: none; border-top: 5px solid #0d6efd;
+            cursor: pointer; border-radius: 12px;
         }
         .card-custom:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
         .view-section { display: none; }
         .active-section { display: block; }
-        .table-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .table-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         
-        /* PRINT LOGIC - SIRF REPORT NAZAR AAYE */
+        /* Strict Print Rules */
         @media print {
-            .no-print, .navbar, .btn, .breadcrumb, #form-container, #home-section { display: none !important; }
+            .no-print, .navbar, .btn, #form-container, #home-section, .breadcrumb, .select2-container { display: none !important; }
             .view-section { display: block !important; }
-            .table-container { box-shadow: none; padding: 0; border: none; }
-            .container { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
-            table { width: 100% !important; border: 1px solid #000; }
-            th, td { border: 1px solid #ddd !important; padding: 8px !important; }
-            #current-title { text-align: center; margin-bottom: 20px; text-transform: uppercase; }
+            .container { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
+            table { width: 100% !important; border-collapse: collapse; }
+            th, td { border: 1px solid #dee2e6 !important; padding: 8px !important; color: black !important; }
+            #current-title { text-align: center; margin-bottom: 20px; font-weight: bold; }
         }
     </style>
 </head>
@@ -51,96 +48,108 @@
     <div class="container">
         
         <div id="home-section" class="view-section active-section">
-            <h4 class="mb-4 fw-bold text-dark text-center">Main Management Console</h4>
-            <div class="row g-4 justify-content-center">
+            <h4 class="mb-4 fw-bold text-dark">Management Console</h4>
+            <div class="row g-4">
                 <div class="col-md-4">
                     <div class="card h-100 card-custom text-center p-4 shadow-sm" onclick="openCategory('Tehsils')">
-                        <i class="fas fa-location-dot fa-3x text-primary mb-3"></i>
+                        <i class="fas fa-map-location-dot fa-3x text-primary mb-3"></i>
                         <h5 class="fw-bold">Tehsils</h5>
-                        <p class="text-muted small m-0">Manage Operational Areas</p>
+                        <p class="text-muted small m-0">Manage Areas</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 card-custom text-center p-4 shadow-sm" onclick="openCategory('Managers')">
-                        <i class="fas fa-user-tie fa-3x text-primary mb-3"></i>
+                        <i class="fas fa-user-gear fa-3x text-primary mb-3"></i>
                         <h5 class="fw-bold">Managers</h5>
                         <p class="text-muted small m-0">Team Profiles</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 card-custom text-center p-4 shadow-sm" onclick="openCategory('ManagerExpenses')">
-                        <i class="fas fa-file-invoice-dollar fa-3x text-primary mb-3"></i>
+                        <i class="fas fa-money-bill-trend-up fa-3x text-primary mb-3"></i>
                         <h5 class="fw-bold">Manager Exp</h5>
-                        <p class="text-muted small m-0">Track Spendings</p>
+                        <p class="text-muted small m-0">Operational Costs</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 card-custom text-center p-4 shadow-sm" onclick="openCategory('Salary')">
-                        <i class="fas fa-money-bill-transfer fa-3x text-primary mb-3"></i>
+                        <i class="fas fa-address-card fa-3x text-primary mb-3"></i>
                         <h5 class="fw-bold">Salary</h5>
-                        <p class="text-muted small m-0">Payroll & Records</p>
+                        <p class="text-muted small m-0">Payroll Logs</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card h-100 card-custom text-center p-4 shadow-sm" onclick="openCategory('Income')">
-                        <i class="fas fa-coins fa-3x text-primary mb-3"></i>
+                        <i class="fas fa-sack-dollar fa-3x text-primary mb-3"></i>
                         <h5 class="fw-bold">Income</h5>
-                        <p class="text-muted small m-0">Revenue Logs</p>
+                        <p class="text-muted small m-0">Revenue Records</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <div id="category-section" class="view-section">
-            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <button class="btn btn-sm btn-secondary no-print mb-2" onclick="showHome()"><i class="fas fa-arrow-left"></i></button>
-                    <h2 id="current-title" class="fw-bold m-0">Report Name</h2>
+                    <button class="btn btn-sm btn-outline-secondary no-print mb-2" onclick="showHome()"><i class="fas fa-arrow-left"></i> Back</button>
+                    <h2 id="current-title" class="fw-bold m-0">Category</h2>
                 </div>
                 <div class="no-print">
-                    <button class="btn btn-primary shadow-sm me-2" onclick="prepareNewRecord()">
-                        <i class="fas fa-plus"></i> New Record
-                    </button>
-                    <button class="btn btn-dark shadow-sm" onclick="window.print()">
-                        <i class="fas fa-print"></i> Print Report
-                    </button>
+                    <button class="btn btn-primary me-2 shadow-sm" onclick="prepareNewRecord()"><i class="fas fa-plus"></i> New Record</button>
+                    <button class="btn btn-dark shadow-sm" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                </div>
+            </div>
+
+            <div id="filter-container" class="card border-0 shadow-sm mb-4 no-print bg-white p-3">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Filter Tehsil</label>
+                        <select id="filter-tehsil" class="form-select form-select-sm"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">From Date</label>
+                        <input type="date" id="filter-from" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">To Date</label>
+                        <input type="date" id="filter-to" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-md-3 d-flex gap-2">
+                        <button class="btn btn-sm btn-primary w-100" onclick="applyFilters()">Apply</button>
+                        <button class="btn btn-sm btn-light border w-100" onclick="resetFilters()">Reset</button>
+                    </div>
                 </div>
             </div>
 
             <div id="form-container" class="card border-0 shadow-sm mb-4 no-print" style="display:none;">
-                <div class="card-body bg-light rounded-3">
+                <div class="card-body bg-light rounded">
                     <form id="dynamic-form" class="row g-3">
                         <input type="hidden" id="category-type" name="Category">
                         <input type="hidden" name="ID" id="input-id">
                         
                         <div class="col-md-6" id="manager-select-group" style="display:none;">
-                            <label class="form-label fw-bold">Select Manager</label>
+                            <label class="form-label fw-bold">Manager</label>
                             <select name="ManagerName" id="manager-dropdown" class="select2-bs5"></select>
                         </div>
-
                         <div class="col-md-6" id="tehsil-select-group">
-                            <label class="form-label fw-bold">Select Tehsil</label>
+                            <label class="form-label fw-bold">Tehsil</label>
                             <select name="ParentTehsil" id="tehsil-dropdown" class="select2-bs5"></select>
                         </div>
-
                         <div class="col-md-12">
                             <label class="form-label fw-bold" id="label-desc">Description</label>
-                            <input type="text" name="Description" class="form-control form-control-lg" required>
+                            <input type="text" name="Description" class="form-control" required>
                         </div>
-
                         <div class="col-md-6" id="amount-group">
                             <label class="form-label fw-bold">Amount</label>
                             <input type="number" name="Amount" class="form-control">
                         </div>
-
                         <div class="col-md-6" id="date-group">
                             <label class="form-label fw-bold">Date</label>
                             <input type="date" name="Date" class="form-control">
                         </div>
-
-                        <div class="col-12 mt-4 text-end">
-                            <button type="button" class="btn btn-link text-muted me-3" onclick="toggleView('list')">Cancel</button>
-                            <button type="submit" class="btn btn-success btn-lg px-5 shadow" id="submit-btn">Save Record</button>
+                        <div class="col-12 text-end">
+                            <button type="button" class="btn btn-link text-muted" onclick="toggleView('list')">Cancel</button>
+                            <button type="submit" class="btn btn-success px-4" id="submit-btn">Save</button>
                         </div>
                     </form>
                 </div>
@@ -148,7 +157,7 @@
 
             <div id="data-list-container" class="table-container shadow-sm">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle">
                         <thead class="table-dark" id="table-head"></thead>
                         <tbody id="table-body"></tbody>
                     </table>
@@ -163,10 +172,10 @@
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbz3AFsk31Y5aEV8Ka_FJ28SfvFJQZPp0k71EfZBfWUJzExv7c3zb-lWUadJ_TY7KcfK5g/exec';
-        let currentCategory = "", allData = [], isEditing = false, editRowNum = null;
+        let currentCategory = "", allData = [], filteredCategoryData = [], isEditing = false, editRowNum = null;
 
         $(document).ready(function() {
-            $('.select2-bs5').select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Click to select' });
+            $('.select2-bs5').select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Select Option' });
         });
 
         function showHome() {
@@ -175,8 +184,8 @@
         }
 
         function toggleView(view) {
-            if(view === 'form') { $('#form-container').fadeIn(); $('#data-list-container').hide(); }
-            else { $('#form-container').hide(); $('#data-list-container').fadeIn(); }
+            if(view === 'form') { $('#form-container').show(); $('#data-list-container, #filter-container').hide(); }
+            else { $('#form-container').hide(); $('#data-list-container, #filter-container').show(); }
         }
 
         function openCategory(name) {
@@ -184,16 +193,15 @@
             toggleView('list');
             $('#home-section').removeClass('active-section');
             $('#category-section').addClass('active-section');
-            $('#current-title').text(name + " Report");
+            $('#current-title').text(name);
             $('#category-type').val(name);
 
             $('#manager-select-group').toggle(name === 'ManagerExpenses');
             $('#tehsil-select-group').toggle(name !== 'Tehsils');
+            $('#filter-container').toggle(!['Tehsils', 'Managers'].includes(name));
             $('#amount-group, #date-group').toggle(!['Tehsils', 'Managers'].includes(name));
             
-            const descLabel = (name === 'Managers') ? "Full Name" : (name === 'Salary' ? "Employee Name" : "Description");
-            $('#label-desc').text(descLabel);
-
+            $('#label-desc').text(name === 'Managers' ? "Manager Name" : (name === 'Salary' ? "Employee Name" : "Description"));
             fetchListData();
         }
 
@@ -202,49 +210,82 @@
             fetch(scriptURL).then(res => res.json()).then(data => {
                 allData = data;
                 updateDropdowns();
-                renderTable(data.filter(item => item.Category === currentCategory));
+                filteredCategoryData = data.filter(item => item.Category === currentCategory);
+                renderTable(filteredCategoryData);
             });
         }
 
+        function formatDate(dateStr) {
+            if (!dateStr) return "-";
+            const date = new Date(dateStr);
+            if (isNaN(date)) return dateStr;
+            return date.toISOString().split('T')[0]; // Sirf YYYY-MM-DD
+        }
+
         function renderTable(data) {
-            if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center py-4'>No data available.</td></tr>"); return; }
+            if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center py-4'>No data found.</td></tr>"); return; }
 
             const headers = Object.keys(data[0]).filter(h => !['rowNum', 'Category', 'ID'].includes(h));
-            $('#table-head').html(`<tr>${headers.map(h => `<th class="py-3 px-3">${h}</th>`).join('')}<th class="no-print">Actions</th></tr>`);
+            $('#table-head').html(`<tr>${headers.map(h => `<th class="px-3">${h}</th>`).join('')}<th class="no-print">Actions</th></tr>`);
             
-            let totalAmt = 0;
+            let total = 0;
             let rowsHtml = data.map(row => {
-                if(row.Amount) totalAmt += parseFloat(row.Amount);
+                if(row.Amount) total += parseFloat(row.Amount);
                 return `<tr>
-                    ${headers.map(h => `<td class="px-3">${row[h] || '-'}</td>`).join('')}
+                    ${headers.map(h => {
+                        let val = row[h] || '-';
+                        if(h === 'Date') val = formatDate(val); // Formatting date here
+                        return `<td class="px-3">${val}</td>`;
+                    }).join('')}
                     <td class="no-print">
-                        <button class="btn btn-sm btn-primary me-1" onclick='editRecord(${JSON.stringify(row)})'><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-danger" onclick='deleteRecord(${row.rowNum})'><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-sm btn-primary me-1 shadow-sm" onclick='editRecord(${JSON.stringify(row)})'><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger shadow-sm" onclick='deleteRecord(${row.rowNum})'><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
             }).join('');
 
-            // ADD TOTAL ROW (if category has Amount)
             if(!['Tehsils', 'Managers'].includes(currentCategory)) {
-                rowsHtml += `<tr class="table-info fw-bold"><td colspan="${headers.indexOf('Amount')}">TOTAL</td><td>${totalAmt.toLocaleString()}</td><td colspan="2"></td></tr>`;
+                rowsHtml += `<tr class="table-info fw-bold"><td colspan="${headers.indexOf('Amount')}">TOTAL</td><td>${total.toLocaleString()}</td><td colspan="5"></td></tr>`;
             }
-
             $('#table-body').html(rowsHtml);
         }
 
+        function applyFilters() {
+            const teh = $('#filter-tehsil').val();
+            const from = $('#filter-from').val();
+            const to = $('#filter-to').val();
+            
+            let res = filteredCategoryData;
+            if(teh) res = res.filter(i => i.ParentTehsil === teh);
+            if(from || to) {
+                res = res.filter(i => {
+                    if(!i.Date) return false;
+                    const d = new Date(i.Date).setHours(0,0,0,0);
+                    const s = from ? new Date(from).setHours(0,0,0,0) : null;
+                    const e = to ? new Date(to).setHours(0,0,0,0) : null;
+                    return (!s || d >= s) && (!e || d <= e);
+                });
+            }
+            renderTable(res);
+        }
+
+        function resetFilters() {
+            $('#filter-tehsil, #filter-from, #filter-to').val('');
+            renderTable(filteredCategoryData);
+        }
+
         function deleteRecord(num) {
-            if(!confirm("Are you sure you want to delete this record permanently?")) return;
-            const btn = event.target.closest('button');
-            btn.disabled = true;
+            if(!confirm("Pakka? Delete kar doon?")) return;
             let fd = new FormData(); fd.append('action', 'DELETE'); fd.append('rowNum', num);
-            fetch(scriptURL, { method: 'POST', body: fd }).then(() => { alert("Record Deleted!"); fetchListData(); });
+            fetch(scriptURL, { method: 'POST', body: fd }).then(() => { alert("Deleted!"); fetchListData(); });
         }
 
         function updateDropdowns() {
             const tehsils = allData.filter(i => i.Category === 'Tehsils');
             const managers = allData.filter(i => i.Category === 'Managers');
-            $('#tehsil-dropdown').html('<option></option>' + tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join(''));
-            $('#manager-dropdown').html('<option></option>' + managers.map(m => `<option value="${m.Description}">${m.Description}</option>`).join(''));
+            const tOpts = '<option value="">All Tehsils</option>' + tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join('');
+            $('#tehsil-dropdown, #filter-tehsil').html(tOpts);
+            $('#manager-dropdown').html('<option value="">Select Manager</option>' + managers.map(m => `<option value="${m.Description}">${m.Description}</option>`).join(''));
         }
 
         function prepareNewRecord() {
@@ -262,8 +303,8 @@
             const f = $('#dynamic-form');
             f.find('[name="ID"]').val(data.ID);
             f.find('[name="Description"]').val(data.Description);
-            if (data.Amount) f.find('[name="Amount"]').val(data.Amount);
-            if (data.Date) f.find('[name="Date"]').val(data.Date.split('T')[0]);
+            if(data.Amount) f.find('[name="Amount"]').val(data.Amount);
+            if(data.Date) f.find('[name="Date"]').val(formatDate(data.Date));
             $('#tehsil-dropdown').val(data.ParentTehsil).trigger('change');
             $('#manager-dropdown').val(data.ManagerName).trigger('change');
             toggleView('form');
@@ -272,12 +313,12 @@
         $('#dynamic-form').on('submit', function(e) {
             e.preventDefault();
             const btn = $('#submit-btn');
-            btn.prop('disabled', true).text("Processing...");
+            btn.prop('disabled', true).text("Saving...");
             let fd = new FormData(this);
-            if (isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); }
+            if(isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); }
             fetch(scriptURL, { method: 'POST', body: fd }).then(() => {
                 toggleView('list'); fetchListData();
-                btn.prop('disabled', false).text("Save Record");
+                btn.prop('disabled', false).text("Save");
             });
         });
     </script>
