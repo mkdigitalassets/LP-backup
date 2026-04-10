@@ -432,52 +432,60 @@
                 });
         }
 
-        function renderTable(dataToDisplay) {
-            const tbody = document.getElementById('table-body');
-            const thead = document.getElementById('table-head');
+       function renderTable(dataToDisplay) {
+    const tbody = document.getElementById('table-body');
+    const thead = document.getElementById('table-head');
 
-            if (dataToDisplay.length === 0) {
-                thead.innerHTML = "";
-                tbody.innerHTML =
-                    "<tr><td style='padding:20px; text-align:center;'>No records found.</td></tr>";
-                return;
+    if (dataToDisplay.length === 0) {
+        tbody.innerHTML = "<tr><td style='padding:20px; text-align:center;'>No records found.</td></tr>";
+        return;
+    }
+
+    // rowNum ko hide rakhna hy
+    const headers = Object.keys(dataToDisplay[0]).filter(h => h !== 'rowNum');
+    thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}<th>Actions</th></tr>`;
+    
+    // Total calculate krny k liye variable
+    let totalAmount = 0;
+
+    let rowsHtml = dataToDisplay.map(row => {
+        return `<tr>${headers.map(h => {
+            let value = row[h] || '';
+            
+            // Date format fix
+            if (h === 'Date' && value !== '') {
+                value = value.toString().split('T')[0].split(' ')[0];
             }
+            
+            // Amount jama krna (Total k liye)
+            if (h === 'Amount' && value !== '') {
+                totalAmount += parseFloat(value) || 0;
+            }
+            
+            return `<td>${value}</td>`;
+        }).join('')}
+        <td>
+            <button onclick='editRecord(${JSON.stringify(row)})' style='background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:5px;'>Edit</button>
+            <button onclick='deleteRecord(${row.rowNum})' style='background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;'>Delete</button>
+        </td>
+        </tr>`;
+    }).join('');
 
-            const headers = Object.keys(dataToDisplay[0]).filter(h => h !== 'rowNum');
-
-            thead.innerHTML =
-                `<tr>${headers.map(h => `<th>${h}</th>`).join('')}<th>Actions</th></tr>`;
-
-            tbody.innerHTML = dataToDisplay.map(row => {
-
-                let rowsHtml = headers.map(h => {
-                    let value = row[h] || '';
-
-                    if (h === 'Date' && value !== '') {
-                        value = value.toString().split('T')[0].split(' ')[0];
-                    }
-
-                    return `<td>${value}</td>`;
-                }).join('');
-
-                return `
-                    <tr>
-                        ${rowsHtml}
-                        <td>
-                            <button onclick='editRecord(${JSON.stringify(row)})'
-                                style='background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:5px;'>
-                                Edit
-                            </button>
-
-                            <button onclick='deleteRecord(${row.rowNum})'
-                                style='background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;'>
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+    // --- TOTAL ROW KI LOGIC ---
+    let totalRowHtml = `<tr style="background-color: #f1f5f9; font-weight: bold; border-top: 2px solid #cbd5e1;">`;
+    headers.forEach((h, index) => {
+        if (index === 0) {
+            totalRowHtml += `<td colspan="${headers.length - 1}" style="text-align: right; padding-right: 20px;">GRAND TOTAL:</td>`;
+        } else if (h === 'Amount') {
+            totalRowHtml += `<td style="color: #1e293b;">${totalAmount.toLocaleString()}</td>`;
         }
+    });
+    // Action column k neechy khali cell
+    totalRowHtml += `<td></td></tr>`;
+
+    // Table mein rows aur total row dono add krna
+    tbody.innerHTML = rowsHtml + totalRowHtml;
+}
 
         function deleteRecord(rowNum) {
             if (!confirm("Are you sure you want to delete?")) return;
