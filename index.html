@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel Dashboard</title>
+
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #3b82f6;
+            --success: #22c55e;
+            --bg: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--bg);
+        }
+
+        /* Navbar */
+        nav {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            margin-left: 15px;
+            text-decoration: none;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            color: var(--secondary);
+        }
+
+        /* Dashboard Grid */
+        .container {
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Card Styling */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-top: 4px solid var(--secondary);
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .card i {
+            font-size: 2.5rem;
+            color: #6366f1;
+            margin-bottom: 10px;
+            display: block;
+            font-style: normal;
+        }
+
+        .card h3 {
+            margin: 10px 0 5px;
+            color: #1e293b;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ef4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        /* Sections */
+        .view-section {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+        }
+
+        .active {
+            display: block;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-back {
+            background: #64748b;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-links {
+                margin-top: 10px;
+            }
+
+            .nav-links a {
+                margin-left: 0;
+                margin-right: 15px;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .view-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">ADMIN PANEL</div>
+        <div class="nav-links">
+            <a onclick="showHome()">Home</a>
+            <a>Change Password</a>
+            <a>Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="home-section" class="view-section active">
+            <h2 style="text-align: center; color: #334155;">Admin Dashboard</h2>
+
+            <div class="dashboard-grid">
+                <div class="card" onclick="openCategory('Tehsils')">
+                    <i>📍</i>
+                    <h3>Tehsils</h3>
+                    <p>Manage Areas</p>
+                </div>
+
+                <div class="card" onclick="openCategory('Salary')">
+                    <i>💳</i>
+                    <h3>Salary</h3>
+                    <p>Payroll</p>
+                </div>
+
+                <div class="card" onclick="openCategory('Income')">
+                    <i>💰</i>
+                    <h3>Income</h3>
+                    <p>Revenue</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="category-section" class="view-section">
+            <button class="btn btn-back" onclick="showHome()">← Back to Dashboard</button>
+
+            <h2 id="current-title" style="color: #1e293b; margin-bottom: 5px;">
+                Category Name
+            </h2>
+
+            <form id="dynamic-form" style="max-width: 600px; margin-bottom: 30px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <input type="hidden" id="category-type" name="Category">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label id="label-id" style="font-weight:600;">ID</label>
+                        <input type="text" name="ID" id="input-id" required>
+                    </div>
+
+                    <div class="form-group" id="tehsil-select-group" style="display:none;">
+                        <label style="font-weight:600;">Select Tehsil</label>
+                        <select name="ParentTehsil" id="tehsil-dropdown">
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label id="label-desc" style="font-weight:600;">Name/Description</label>
+                    <input type="text" name="Description" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group" id="amount-group">
+                        <label style="font-weight:600;">Amount</label>
+                        <input type="number" name="Amount">
+                    </div>
+
+                    <div class="form-group" id="date-group">
+                        <label style="font-weight:600;">Date</label>
+                        <input type="date" name="Date">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" id="submit-btn" style="background: #22c55e;">
+                    Save Record
+                </button>
+            </form>
+
+            <hr style="border: 0; border-top: 2px solid #e2e8f0; margin: 30px 0;">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: #1e293b;">Recent Records List</h3>
+
+                <button onclick="fetchListData()" class="btn" style="width: auto; background: #2c3e50; padding: 5px 15px; font-size: 13px;">
+                    Refresh Data
+                </button>
+            </div>
+
+            <div id="filter-container" style="display:none; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+                <div style="flex: 1; min-width: 140px;">
+                    <label style="font-size: 11px; font-weight: bold; color: #64748b;">TEHSIL</label>
+                    <select id="filter-tehsil" style="margin:0; padding: 8px;"></select>
+                </div>
+
+                <div style="flex: 1; min-width: 140px;">
+                    <label style="font-size: 11px; font-weight: bold; color: #64748b;">FROM DATE</label>
+                    <input type="date" id="filter-from-date" style="margin:0; padding: 8px;">
+                </div>
+
+                <div style="flex: 1; min-width: 140px;">
+                    <label style="font-size: 11px; font-weight: bold; color: #64748b;">TO DATE</label>
+                    <input type="date" id="filter-to-date" style="margin:0; padding: 8px;">
+                </div>
+
+                <div style="display: flex; gap: 5px;">
+                    <button onclick="applyFilters()" class="btn" style="width: auto; padding: 8px 15px; background: #3b82f6;">
+                        Apply
+                    </button>
+
+                    <button onclick="resetFilters()" class="btn" style="width: auto; padding: 8px 15px; background: #64748b;">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <div style="overflow-x:auto; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <table id="category-table" style="margin-top: 0;">
+                    <thead id="table-head"></thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz3AFsk31Y5aEV8Ka_FJ28SfvFJQZPp0k71EfZBfWUJzExv7c3zb-lWUadJ_TY7KcfK5g/exec';
+
+        let currentCategory = "";
+        let allData = [];
+        let filteredCategoryData = [];
+
+        let isEditing = false;
+        let editRowNum = null;
+
+        function showHome() {
+            document.getElementById('category-section').classList.remove('active');
+            document.getElementById('home-section').classList.add('active');
+            resetFormState();
+        }
+
+        function openCategory(name) {
+            currentCategory = name;
+
+            document.getElementById('home-section').classList.remove('active');
+            document.getElementById('category-section').classList.add('active');
+
+            document.getElementById('current-title').innerText = name + " Management";
+            document.getElementById('category-type').value = name;
+
+            const tehsilGroup = document.getElementById('tehsil-select-group');
+            const amountGroup = document.getElementById('amount-group');
+            const dateGroup = document.getElementById('date-group');
+            const filterContainer = document.getElementById('filter-container');
+
+            resetFormState();
+
+            if (name === 'Tehsils') {
+                tehsilGroup.style.display = 'none';
+                amountGroup.style.display = 'none';
+                dateGroup.style.display = 'none';
+                filterContainer.style.display = 'none';
+
+                document.getElementById('label-id').innerText = "Tehsil ID";
+                document.getElementById('label-desc').innerText = "Tehsil Name";
+            } else {
+                tehsilGroup.style.display = 'block';
+                amountGroup.style.display = 'block';
+                dateGroup.style.display = 'block';
+                filterContainer.style.display = 'flex';
+
+                document.getElementById('label-id').innerText = name + " ID";
+                document.getElementById('label-desc').innerText =
+                    (name === 'Salary' ? "Employee Name" : "Description");
+            }
+
+            fetchListData();
+        }
+
+        function updateTehsilDropdowns() {
+            const formDropdown = document.getElementById('tehsil-dropdown');
+            const filterDropdown = document.getElementById('filter-tehsil');
+
+            const tehsils = allData.filter(item => item.Category === 'Tehsils');
+
+            let optionsHtml = tehsils.map(t =>
+                `<option value="${t.Description}">${t.Description}</option>`
+            ).join('');
+
+            formDropdown.innerHTML =
+                '<option value="">Select Tehsil</option>' + optionsHtml;
+
+            filterDropdown.innerHTML =
+                '<option value="">All Tehsils</option>' + optionsHtml;
+        }
+
+        function fetchListData() {
+            const tbody = document.getElementById('table-body');
+
+            tbody.innerHTML =
+                "<tr><td style='padding:20px; text-align:center;'>Loading records...</td></tr>";
+
+            fetch(scriptURL)
+                .then(res => res.json())
+                .then(data => {
+                    allData = data;
+                    updateTehsilDropdowns();
+
+                    filteredCategoryData = data.filter(item =>
+                        item.Category === currentCategory
+                    );
+
+                    renderTable(filteredCategoryData);
+                })
+                .catch(err => {
+                    console.error(err);
+                    tbody.innerHTML =
+                        "<tr><td style='padding:20px; text-align:center;'>Error loading data.</td></tr>";
+                });
+        }
+
+        function renderTable(dataToDisplay) {
+            const tbody = document.getElementById('table-body');
+            const thead = document.getElementById('table-head');
+
+            if (dataToDisplay.length === 0) {
+                thead.innerHTML = "";
+                tbody.innerHTML =
+                    "<tr><td style='padding:20px; text-align:center;'>No records found.</td></tr>";
+                return;
+            }
+
+            const headers = Object.keys(dataToDisplay[0]).filter(h => h !== 'rowNum');
+
+            thead.innerHTML =
+                `<tr>${headers.map(h => `<th>${h}</th>`).join('')}<th>Actions</th></tr>`;
+
+            tbody.innerHTML = dataToDisplay.map(row => {
+
+                let rowsHtml = headers.map(h => {
+                    let value = row[h] || '';
+
+                    if (h === 'Date' && value !== '') {
+                        value = value.toString().split('T')[0].split(' ')[0];
+                    }
+
+                    return `<td>${value}</td>`;
+                }).join('');
+
+                return `
+                    <tr>
+                        ${rowsHtml}
+                        <td>
+                            <button onclick='editRecord(${JSON.stringify(row)})'
+                                style='background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:5px;'>
+                                Edit
+                            </button>
+
+                            <button onclick='deleteRecord(${row.rowNum})'
+                                style='background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;'>
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function deleteRecord(rowNum) {
+            if (!confirm("Are you sure you want to delete?")) return;
+
+            let formData = new FormData();
+            formData.append('action', 'DELETE');
+            formData.append('rowNum', rowNum);
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                alert("Deleted Successfully!");
+                fetchListData();
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Delete failed! Check Console.");
+            });
+        }
+
+        function editRecord(data) {
+            isEditing = true;
+            editRowNum = data.rowNum;
+
+            const form = document.getElementById('dynamic-form');
+
+            form.querySelector('[name="ID"]').value = data.ID || '';
+            form.querySelector('[name="Description"]').value = data.Description || '';
+
+            if (data.Amount) {
+                form.querySelector('[name="Amount"]').value = data.Amount;
+            }
+
+            if (data.Date) {
+                form.querySelector('[name="Date"]').value =
+                    data.Date.split('T')[0].split(' ')[0];
+            }
+
+            if (data.ParentTehsil) {
+                document.getElementById('tehsil-dropdown').value = data.ParentTehsil;
+            }
+
+            document.getElementById('submit-btn').innerText = "Update Record";
+            document.getElementById('submit-btn').style.background = "#f59e0b";
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function resetFormState() {
+            isEditing = false;
+            editRowNum = null;
+
+            document.getElementById('dynamic-form').reset();
+            document.getElementById('category-type').value = currentCategory;
+
+            document.getElementById('submit-btn').innerText = "Save Record";
+            document.getElementById('submit-btn').style.background = "#22c55e";
+            document.getElementById('submit-btn').disabled = false;
+        }
+
+        document.getElementById('dynamic-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            let formData = new FormData(this);
+
+            if (isEditing) {
+                formData.append('action', 'UPDATE');
+                formData.append('rowNum', editRowNum);
+            }
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                alert(isEditing ? "Updated Successfully!" : "Saved Successfully!");
+
+                resetFormState();
+                fetchListData();
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error: " + err);
+
+                btn.disabled = false;
+                btn.innerText = isEditing ? "Update Record" : "Save Record";
+            });
+        });
+
+        function applyFilters() {
+            const tehsilValue = document.getElementById('filter-tehsil').value;
+            const fromDate = document.getElementById('filter-from-date').value;
+            const toDate = document.getElementById('filter-to-date').value;
+
+            let result = filteredCategoryData;
+
+            if (tehsilValue) {
+                result = result.filter(item => item.ParentTehsil === tehsilValue);
+            }
+
+            if (fromDate || toDate) {
+                result = result.filter(item => {
+                    if (!item.Date) return false;
+
+                    const itemDate = new Date(item.Date);
+                    itemDate.setHours(0, 0, 0, 0);
+
+                    const start = fromDate ? new Date(fromDate) : null;
+                    const end = toDate ? new Date(toDate) : null;
+
+                    if (start) start.setHours(0, 0, 0, 0);
+                    if (end) end.setHours(23, 59, 59, 999);
+
+                    if (start && end) return itemDate >= start && itemDate <= end;
+                    if (start) return itemDate >= start;
+                    if (end) return itemDate <= end;
+
+                    return true;
+                });
+            }
+
+            renderTable(result);
+        }
+
+        function resetFilters() {
+            document.getElementById('filter-tehsil').value = "";
+            document.getElementById('filter-from-date').value = "";
+            document.getElementById('filter-to-date').value = "";
+
+            renderTable(filteredCategoryData);
+        }
+    </script>
+
+</body>
+</html>
