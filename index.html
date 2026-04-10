@@ -3,97 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Manager Logic</title>
+    <title>Admin Panel - Bootstrap 5</title>
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root { --primary: #1e293b; --secondary: #3b82f6; --success: #22c55e; --bg: #f1f5f9; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); }
-        nav { background: var(--primary); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .container { padding: 2rem; }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.2rem; }
-        .card { background: white; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s; border-top: 4px solid var(--secondary); }
-        .card:hover { transform: translateY(-5px); }
-        .view-section { display: none; background: white; padding: 2rem; border-radius: 12px; }
-        .active { display: block; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
-        /* Select2 override to match theme */
-        .select2-container--default .select2-selection--single { height: 40px; border: 1px solid #cbd5e1; border-radius: 6px; }
-        .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 40px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
-        .btn { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar { background-color: #1e293b !important; }
+        .card-custom { 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            border: none; 
+            border-top: 4px solid #0d6efd;
+            cursor: pointer;
+        }
+        .card-custom:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .view-section { display: none; }
+        .active-section { display: block; }
+        .table-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .view-section { display: block !important; }
+            body { background: white; }
+        }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div style="font-weight:bold">ADMIN DASHBOARD</div>
-        <div onclick="location.reload()" style="cursor:pointer">Logout</div>
+    <nav class="navbar navbar-dark no-print mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#" onclick="showHome()">
+                <i class="fas fa-user-shield me-2"></i>ADMIN DASHBOARD
+            </a>
+            <button class="btn btn-outline-light btn-sm" onclick="location.reload()">Logout</button>
+        </div>
     </nav>
 
     <div class="container">
-        <div id="home-section" class="view-section active">
-            <div class="dashboard-grid">
-                <div class="card" onclick="openCategory('Tehsils')"><i>📍</i><h3>Tehsils</h3></div>
-                <div class="card" onclick="openCategory('Managers')"><i>👤</i><h3>Managers</h3></div>
-                <div class="card" onclick="openCategory('ManagerExpenses')"><i>💸</i><h3>Manager Exp</h3></div>
-                <div class="card" onclick="openCategory('Salary')"><i>💳</i><h3>Salary</h3></div>
-                <div class="card" onclick="openCategory('Income')"><i>💰</i><h3>Income</h3></div>
+        
+        <div id="home-section" class="view-section active-section">
+            <h3 class="mb-4 text-secondary">Main Menu</h3>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 card-custom text-center p-4" onclick="openCategory('Tehsils')">
+                        <i class="fas fa-map-marker-alt fa-3x text-primary mb-3"></i>
+                        <h4 class="fw-bold">Tehsils</h4>
+                        <p class="text-muted small">Manage Locations</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 card-custom text-center p-4" onclick="openCategory('Managers')">
+                        <i class="fas fa-users-cog fa-3x text-primary mb-3"></i>
+                        <h4 class="fw-bold">Managers</h4>
+                        <p class="text-muted small">Manage Team</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 card-custom text-center p-4" onclick="openCategory('ManagerExpenses')">
+                        <i class="fas fa-wallet fa-3x text-primary mb-3"></i>
+                        <h4 class="fw-bold">Manager Exp</h4>
+                        <p class="text-muted small">Operational Costs</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 card-custom text-center p-4" onclick="openCategory('Salary')">
+                        <i class="fas fa-money-check-alt fa-3x text-primary mb-3"></i>
+                        <h4 class="fw-bold">Salary</h4>
+                        <p class="text-muted small">Payroll Management</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 card-custom text-center p-4" onclick="openCategory('Income')">
+                        <i class="fas fa-hand-holding-usd fa-3x text-primary mb-3"></i>
+                        <h4 class="fw-bold">Income</h4>
+                        <p class="text-muted small">Revenue Tracking</p>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="category-section" class="view-section">
-            <button class="btn" style="background:#64748b" onclick="showHome()">← Back</button>
-            <h2 id="current-title">Category</h2>
+            <nav aria-label="breadcrumb" class="no-print">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#" onclick="showHome()">Home</a></li>
+                    <li class="breadcrumb-item active" id="breadcrumb-title">Category</li>
+                </ol>
+            </nav>
 
-            <div id="form-container" style="display:none; max-width: 600px; margin: 20px auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
-                <form id="dynamic-form">
-                    <input type="hidden" id="category-type" name="Category">
-                    <input type="hidden" name="ID" id="input-id">
-                    
-                    <div class="form-group" id="manager-select-group" style="display:none;">
-                        <label>Select Manager</label>
-                        <select name="ManagerName" id="manager-dropdown" class="select2-field"></select>
-                    </div>
-
-                    <div class="form-group" id="tehsil-select-group">
-                        <label>Tehsil</label>
-                        <select name="ParentTehsil" id="tehsil-dropdown" class="select2-field"></select>
-                    </div>
-
-                    <div class="form-group" id="desc-group">
-                        <label id="label-desc">Description</label>
-                        <input type="text" name="Description" id="input-desc">
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group" id="amount-group">
-                            <label>Amount</label>
-                            <input type="number" name="Amount">
-                        </div>
-                        <div class="form-group" id="date-group">
-                            <label>Date</label>
-                            <input type="date" name="Date">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn" id="submit-btn" style="width:100%">Save Data</button>
-                </form>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 id="current-title" class="fw-bold text-dark m-0">Category Name</h2>
+                <div class="no-print">
+                    <button class="btn btn-primary me-2" onclick="prepareNewRecord()">
+                        <i class="fas fa-plus me-1"></i> Add New
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.print()">
+                        <i class="fas fa-print me-1"></i> Print
+                    </button>
+                </div>
             </div>
 
-            <div id="data-list-container">
-                <button onclick="prepareNewRecord()" class="btn" style="background: #3b82f6; margin-bottom: 20px;">+ Add New Entry</button>
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead id="table-head"></thead>
+            <div id="form-container" class="card shadow-sm mb-4 no-print" style="display:none;">
+                <div class="card-header bg-white fw-bold" id="form-header">Add Record</div>
+                <div class="card-body">
+                    <form id="dynamic-form" class="row g-3">
+                        <input type="hidden" id="category-type" name="Category">
+                        <input type="hidden" name="ID" id="input-id">
+                        
+                        <div class="col-md-6" id="manager-select-group" style="display:none;">
+                            <label class="form-label fw-semibold">Manager Name</label>
+                            <select name="ManagerName" id="manager-dropdown" class="select2-bs5"></select>
+                        </div>
+
+                        <div class="col-md-6" id="tehsil-select-group">
+                            <label class="form-label fw-semibold">Tehsil</label>
+                            <select name="ParentTehsil" id="tehsil-dropdown" class="select2-bs5"></select>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold" id="label-desc">Description</label>
+                            <input type="text" name="Description" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6" id="amount-group">
+                            <label class="form-label fw-semibold">Amount (PKR)</label>
+                            <input type="number" name="Amount" class="form-control">
+                        </div>
+
+                        <div class="col-md-6" id="date-group">
+                            <label class="form-label fw-semibold">Date</label>
+                            <input type="date" name="Date" class="form-control">
+                        </div>
+
+                        <div class="col-12 mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-success px-4" id="submit-btn">Save Record</button>
+                            <button type="button" class="btn btn-light border px-4" onclick="toggleView('list')">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="data-list-container" class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light" id="table-head"></thead>
                         <tbody id="table-body"></tbody>
                     </table>
                 </div>
@@ -101,50 +156,63 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbz3AFsk31Y5aEV8Ka_FJ28SfvFJQZPp0k71EfZBfWUJzExv7c3zb-lWUadJ_TY7KcfK5g/exec';
         let currentCategory = "", allData = [], isEditing = false, editRowNum = null;
 
         $(document).ready(function() {
-            $('.select2-field').select2({ width: '100%' });
+            initSelect2();
         });
 
+        function initSelect2() {
+            $('.select2-bs5').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Choose option...'
+            });
+        }
+
         function showHome() {
-            document.getElementById('category-section').classList.remove('active');
-            document.getElementById('home-section').classList.add('active');
+            $('#category-section').removeClass('active-section');
+            $('#home-section').addClass('active-section');
         }
 
         function toggleView(view) {
-            document.getElementById('form-container').style.display = (view === 'form' ? 'block' : 'none');
-            document.getElementById('data-list-container').style.display = (view === 'list' ? 'block' : 'none');
+            if(view === 'form') {
+                $('#form-container').fadeIn();
+                $('#data-list-container').fadeOut();
+            } else {
+                $('#form-container').fadeOut();
+                $('#data-list-container').fadeIn();
+            }
         }
 
         function openCategory(name) {
             currentCategory = name;
             toggleView('list');
-            document.getElementById('home-section').classList.remove('active');
-            document.getElementById('category-section').classList.add('active');
-            document.getElementById('current-title').innerText = name;
-            document.getElementById('category-type').value = name;
+            $('#home-section').removeClass('active-section');
+            $('#category-section').addClass('active-section');
+            $('#current-title, #breadcrumb-title').text(name);
+            $('#category-type').val(name);
 
-            // UI Visibility Logic
-            document.getElementById('manager-select-group').style.display = (name === 'ManagerExpenses') ? 'block' : 'none';
-            document.getElementById('tehsil-select-group').style.display = (name === 'Tehsils') ? 'none' : 'block';
-            document.getElementById('amount-group').style.display = (['Tehsils', 'Managers'].includes(name)) ? 'none' : 'block';
-            document.getElementById('date-group').style.display = (['Tehsils', 'Managers'].includes(name)) ? 'none' : 'block';
+            // Hide/Show based on category
+            $('#manager-select-group').toggle(name === 'ManagerExpenses');
+            $('#tehsil-select-group').toggle(name !== 'Tehsils');
+            $('#amount-group, #date-group').toggle(!['Tehsils', 'Managers'].includes(name));
             
-            // Description Label
-            const descLabel = document.getElementById('label-desc');
-            if (name === 'Managers') descLabel.innerText = "Manager Name";
-            else if (name === 'Salary') descLabel.innerText = "Employee Name";
-            else descLabel.innerText = "Description";
+            // Labels
+            const descLabel = (name === 'Managers') ? "Manager Name" : (name === 'Salary' ? "Employee Name" : "Description");
+            $('#label-desc').text(descLabel);
 
             fetchListData();
         }
 
         function fetchListData() {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = "<tr><td colspan='8'>Loading...</td></tr>";
+            $('#table-body').html("<tr><td colspan='10' class='text-center py-4'><div class='spinner-border text-primary' role='status'></div></td></tr>");
             fetch(scriptURL).then(res => res.json()).then(data => {
                 allData = data;
                 updateDropdowns();
@@ -154,77 +222,76 @@
         }
 
         function renderTable(data) {
-            const thead = document.getElementById('table-head');
-            const tbody = document.getElementById('table-body');
-            if (!data.length) { tbody.innerHTML = "<tr><td colspan='8'>No data found.</td></tr>"; return; }
+            if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center text-muted py-4'>No records found.</td></tr>"); return; }
 
             const headers = Object.keys(data[0]).filter(h => !['rowNum', 'Category', 'ID'].includes(h));
-            thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}<th>Action</th></tr>`;
+            $('#table-head').html(`<tr>${headers.map(h => `<th class="text-uppercase small fw-bold">${h}</th>`).join('')}<th class="no-print">Action</th></tr>`);
             
-            tbody.innerHTML = data.map(row => `
+            $('#table-body').html(data.map(row => `
                 <tr>
                     ${headers.map(h => `<td>${row[h] || '-'}</td>`).join('')}
-                    <td><button onclick='editRecord(${JSON.stringify(row)})' style='color:blue; border:none; background:none; cursor:pointer;'>Edit</button></td>
+                    <td class="no-print">
+                        <button class="btn btn-sm btn-outline-primary" onclick='editRecord(${JSON.stringify(row)})'>
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
                 </tr>
-            `).join('');
+            `).join(''));
         }
 
         function updateDropdowns() {
-            // Update Tehsil Dropdown
             const tehsils = allData.filter(i => i.Category === 'Tehsils');
-            let tOpts = '<option value="">Select Tehsil</option>' + tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join('');
-            $('#tehsil-dropdown').html(tOpts);
-
-            // Update Manager Dropdown (from Managers category)
             const managers = allData.filter(i => i.Category === 'Managers');
-            let mOpts = '<option value="">Select Manager</option>' + managers.map(m => `<option value="${m.Description}">${m.Description}</option>`).join('');
+
+            let tOpts = '<option></option>' + tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join('');
+            let mOpts = '<option></option>' + managers.map(m => `<option value="${m.Description}">${m.Description}</option>`).join('');
+
+            $('#tehsil-dropdown').html(tOpts);
             $('#manager-dropdown').html(mOpts);
         }
 
         function prepareNewRecord() {
             isEditing = false;
-            document.getElementById('dynamic-form').reset();
-            $('.select2-field').val(null).trigger('change');
-            document.getElementById('category-type').value = currentCategory;
+            $('#dynamic-form')[0].reset();
+            $('.select2-bs5').val(null).trigger('change');
+            $('#form-header').text('Add New ' + currentCategory);
             
-            // Auto-increment logic
+            // Auto ID
             const catData = allData.filter(i => i.Category === currentCategory);
             let maxID = 0;
             catData.forEach(item => { if(parseInt(item.ID) > maxID) maxID = parseInt(item.ID); });
-            document.getElementById('input-id').value = maxID + 1;
+            $('#input-id').val(maxID + 1);
             
             toggleView('form');
         }
 
         function editRecord(data) {
             isEditing = true; editRowNum = data.rowNum;
-            const f = document.getElementById('dynamic-form');
-            f.querySelector('[name="ID"]').value = data.ID;
-            f.querySelector('[name="Description"]').value = data.Description || '';
-            if (data.Amount) f.querySelector('[name="Amount"]').value = data.Amount;
-            if (data.Date) f.querySelector('[name="Date"]').value = data.Date.split('T')[0];
+            $('#form-header').text('Edit Record');
+            const f = $('#dynamic-form');
+            f.find('[name="ID"]').val(data.ID);
+            f.find('[name="Description"]').val(data.Description);
+            if (data.Amount) f.find('[name="Amount"]').val(data.Amount);
+            if (data.Date) f.find('[name="Date"]').val(data.Date.split('T')[0]);
             
-            // Select2 values update
             $('#tehsil-dropdown').val(data.ParentTehsil).trigger('change');
             $('#manager-dropdown').val(data.ManagerName).trigger('change');
             
             toggleView('form');
         }
 
-        document.getElementById('dynamic-form').addEventListener('submit', function(e) {
+        $('#dynamic-form').on('submit', function(e) {
             e.preventDefault();
-            const btn = document.getElementById('submit-btn');
-            btn.disabled = true; btn.innerText = "Saving...";
+            const btn = $('#submit-btn');
+            btn.prop('disabled', true).html("<span class='spinner-border spinner-border-sm'></span> Saving...");
             
             let fd = new FormData(this);
-            // Collect Select2 values manually if needed, but FormData usually handles it
             if (isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); }
             
             fetch(scriptURL, { method: 'POST', body: fd }).then(() => {
-                alert("Success!");
                 toggleView('list');
                 fetchListData();
-                btn.disabled = false; btn.innerText = "Save Data";
+                btn.prop('disabled', false).text("Save Record");
             });
         });
     </script>
