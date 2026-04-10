@@ -161,16 +161,38 @@
         function initSelect2() { $('.select2-bs5').select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Select' }); }
 
         function handleLogin() {
-            const user = $('#login-user').val(), pass = $('#login-pass').val();
-            if(user === adminUser && pass === adminPass) { currentUser = { role: 'admin', name: 'Admin' }; startApp(); }
-            else {
-                fetch(scriptURL).then(res => res.json()).then(data => {
-                    const manager = data.find(i => i.Category === 'Managers' && i.Description === user && i.Password === pass);
-                    if(manager) { currentUser = { role: 'manager', name: manager.Description }; startApp(); }
-                    else { $('#login-error').fadeIn(); }
-                });
+    const user = $('#login-user').val().trim().toLowerCase(); // user input ko clean kiya
+    const pass = $('#login-pass').val().trim();
+
+    if(user === adminUser.toLowerCase() && pass === adminPass) {
+        currentUser = { role: 'admin', name: 'Admin' };
+        startApp();
+    } else {
+        $('#login-error').hide();
+        // Loader dikhayen jab tak check ho raha ho
+        $('#login-overlay button').text("Checking...").prop('disabled', true);
+        
+        fetch(scriptURL).then(res => res.json()).then(data => {
+            // Sheet mein manager dhundna (case insensitive)
+            const manager = data.find(i => 
+                i.Category === 'Managers' && 
+                String(i.Description).toLowerCase() === user && 
+                String(i.Password) === pass
+            );
+
+            if(manager) {
+                currentUser = { role: 'manager', name: manager.Description };
+                startApp();
+            } else {
+                $('#login-error').fadeIn();
+                $('#login-overlay button').text("LOGIN").prop('disabled', false);
             }
-        }
+        }).catch(err => {
+            alert("Error connecting to sheet!");
+            $('#login-overlay button').text("LOGIN").prop('disabled', false);
+        });
+    }
+}
 
         function startApp() { $('#login-overlay').fadeOut(); renderDashboard(); fetchListData(); }
 
