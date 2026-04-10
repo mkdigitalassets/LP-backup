@@ -22,6 +22,12 @@
         .form-control, .form-select { border-radius: 8px; padding: 10px 15px; border: 1px solid #cbd5e1; }
         .btn-save { background: #22c55e; color: white; font-weight: bold; border-radius: 8px; padding: 12px; border: none; width: 100%; }
         
+        /* Summary Highlight Styles */
+        .summary-box { padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; color: white; }
+        .bg-income { background: #22c55e; }
+        .bg-expense { background: #ef4444; }
+        .bg-balance { background: #3b82f6; }
+
         @media print {
             .no-print, .navbar, .btn, #form-container, #home-section, #filter-container { display: none !important; }
             .view-section { display: block !important; }
@@ -41,13 +47,15 @@
         
         <div id="home-section" class="view-section active-section">
             <div class="row g-4 text-center">
+                <div class="col-md-12"><div class="card h-100 card-custom p-4 shadow-sm border-top-0" style="border-left: 10px solid #3b82f6;" onclick="openFinalReport()"><i class="fas fa-chart-pie fa-3x text-primary mb-3"></i><h4 class="fw-bold text-primary">FINAL CONSOLIDATED REPORT</h4><p class="text-muted">View Profit/Loss & All Expenses side-by-side</p></div></div>
+                
                 <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Tehsils')"><i class="fas fa-map-location-dot fa-3x text-primary mb-3"></i><h5 class="fw-bold">Tehsils</h5></div></div>
                 <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Managers')"><i class="fas fa-user-tie fa-3x text-primary mb-3"></i><h5 class="fw-bold">Managers</h5></div></div>
                 <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('ManagerExpenses')"><i class="fas fa-wallet fa-3x text-primary mb-3"></i><h5 class="fw-bold">Manager Exp</h5></div></div>
                 <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Machinary')"><i class="fas fa-tractor fa-3x text-primary mb-3"></i><h5 class="fw-bold">Machinary</h5></div></div>
                 <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('MachinaryExpenses')"><i class="fas fa-tools fa-3x text-primary mb-3"></i><h5 class="fw-bold">Machinary Exp</h5></div></div>
                 <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Income')"><i class="fas fa-sack-dollar fa-3x text-success mb-3"></i><h5 class="fw-bold text-success">Income</h5></div></div>
-                <div class="col-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Salary')"><i class="fas fa-id-card fa-3x text-primary mb-3"></i><h5 class="fw-bold">Salary</h5></div></div>
+                <div class="col-md-4 offset-md-4"><div class="card h-100 card-custom p-4 shadow-sm" onclick="openCategory('Salary')"><i class="fas fa-id-card fa-3x text-primary mb-3"></i><h5 class="fw-bold">Salary</h5></div></div>
             </div>
         </div>
 
@@ -55,48 +63,47 @@
             <div class="main-card">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 id="current-title" class="fw-bold m-0">Category</h2>
-                    <div class="no-print">
+                    <div class="no-print" id="action-buttons">
                         <button class="btn btn-primary px-4 shadow-sm me-2" onclick="prepareNewRecord()"><i class="fas fa-plus me-1"></i> Add Record</button>
                         <button class="btn btn-dark shadow-sm" onclick="window.print()"><i class="fas fa-print"></i></button>
                     </div>
+                </div>
+
+                <div id="summary-highlights" class="row g-3 no-print mb-4" style="display:none;">
+                    <div class="col-md-4"><div class="summary-box bg-income"><h6>Total Income</h6><h3 id="sum-income">0</h3></div></div>
+                    <div class="col-md-4"><div class="summary-box bg-expense"><h6>Total Expenses</h6><h3 id="sum-expense">0</h3></div></div>
+                    <div class="col-md-4"><div class="summary-box bg-balance"><h6>Remaining Balance</h6><h3 id="sum-balance">0</h3></div></div>
                 </div>
 
                 <div id="form-container" class="mb-5 no-print p-4 border rounded-3 bg-white shadow-sm" style="display:none; border-top: 4px solid #22c55e !important;">
                     <form id="dynamic-form">
                         <input type="hidden" id="category-type" name="Category">
                         <input type="hidden" name="ID" id="input-id">
-                        
                         <div class="row g-4">
                             <div class="col-md-6" id="tehsil-select-group">
                                 <label class="form-label">Tehsil</label>
                                 <select name="ParentTehsil" id="tehsil-dropdown" class="select2-bs5"></select>
                             </div>
-
                             <div class="col-md-6" id="manager-select-group" style="display:none;">
                                 <label class="form-label">Manager</label>
                                 <select name="ManagerName" id="manager-dropdown" class="select2-bs5"></select>
                             </div>
-
                             <div class="col-md-6" id="machinary-select-group" style="display:none;">
                                 <label class="form-label">Machinery</label>
                                 <select name="MachinaryName" id="machinary-dropdown" class="select2-bs5"></select>
                             </div>
-
                             <div class="col-md-6" id="amount-group">
                                 <label class="form-label">Amount</label>
                                 <input type="number" name="Amount" class="form-control" placeholder="0">
                             </div>
-
                             <div class="col-md-6" id="date-group">
                                 <label class="form-label">Date</label>
                                 <input type="date" name="Date" class="form-control">
                             </div>
-
                             <div class="col-12" id="desc-group">
                                 <label class="form-label" id="label-desc">Description</label>
                                 <input type="text" name="Description" class="form-control" required>
                             </div>
-
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-save shadow-sm" id="submit-btn">SAVE RECORD</button>
                                 <button type="button" class="btn btn-link text-danger mt-2" onclick="toggleView('list')">Cancel</button>
@@ -110,7 +117,7 @@
                         <div class="col-md-4"><select id="filter-tehsil" class="form-select form-select-sm"></select></div>
                         <div class="col-md-3"><input type="date" id="filter-from" class="form-control form-control-sm"></div>
                         <div class="col-md-3"><input type="date" id="filter-to" class="form-control form-control-sm"></div>
-                        <div class="col-md-2"><button class="btn btn-sm btn-primary w-100" onclick="applyFilters()">Filter</button></div>
+                        <div class="col-md-2"><button class="btn btn-sm btn-primary w-100" id="filter-btn" onclick="applyFilters()">Filter</button></div>
                     </div>
 
                     <div class="table-responsive">
@@ -136,18 +143,27 @@
             $('.select2-bs5').select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Select' });
         });
 
-        function showHome() { $('#category-section').removeClass('active-section'); $('#home-section').addClass('active-section'); }
-        function toggleView(view) { if(view === 'form') { $('#form-container').fadeIn(); $('#data-list-container').hide(); } else { $('#form-container').hide(); $('#data-list-container').fadeIn(); } }
+        function showHome() { 
+            $('#category-section').removeClass('active-section'); 
+            $('#home-section').addClass('active-section'); 
+        }
+
+        function toggleView(view) { 
+            if(view === 'form') { $('#form-container').fadeIn(); $('#data-list-container').hide(); } 
+            else { $('#form-container').hide(); $('#data-list-container').fadeIn(); } 
+        }
 
         function openCategory(name) {
             currentCategory = name;
+            $('#summary-highlights').hide();
+            $('#action-buttons button:first-child').show();
+            $('#filter-btn').attr('onclick', 'applyFilters()');
             toggleView('list');
             $('#home-section').removeClass('active-section');
             $('#category-section').addClass('active-section');
             $('#current-title').text(name);
             $('#category-type').val(name);
 
-            // Form Field Logic
             $('#manager-select-group').toggle(name === 'ManagerExpenses');
             $('#machinary-select-group').toggle(name === 'MachinaryExpenses');
             $('#tehsil-select-group').toggle(name !== 'Tehsils');
@@ -164,14 +180,29 @@
             fetchListData();
         }
 
+        function openFinalReport() {
+            currentCategory = "FinalReport";
+            $('#current-title').text("Consolidated Final Report");
+            $('#home-section').removeClass('active-section');
+            $('#category-section').addClass('active-section');
+            $('#summary-highlights').show();
+            $('#action-buttons button:first-child').hide(); // Hide Add Record button
+            $('#filter-container').show();
+            $('#filter-btn').attr('onclick', 'generateFinalReport()');
+            toggleView('list');
+            fetchListData();
+        }
+
         function fetchListData() {
-            // Aap ka loader (Spinner Grow)
             $('#table-body').html("<tr><td colspan='10' class='text-center py-5'><div class='spinner-grow text-primary'></div></td></tr>");
             fetch(scriptURL).then(res => res.json()).then(data => {
                 allData = data;
                 updateDropdowns();
-                filteredCategoryData = data.filter(item => item.Category === currentCategory);
-                renderTable(filteredCategoryData);
+                if(currentCategory === "FinalReport") { generateFinalReport(); }
+                else {
+                    filteredCategoryData = data.filter(item => item.Category === currentCategory);
+                    renderTable(filteredCategoryData);
+                }
             });
         }
 
@@ -192,6 +223,49 @@
 
             if(total > 0) rowsHtml += `<tr class="table-success fw-bold"><td>TOTAL</td><td colspan="10" class="text-primary h5">${total.toLocaleString()}</td></tr>`;
             $('#table-body').html(rowsHtml);
+        }
+
+        function generateFinalReport() {
+            const teh = $('#filter-tehsil').val();
+            const from = $('#filter-from').val();
+            const to = $('#filter-to').val();
+
+            let data = allData.filter(i => !['Tehsils', 'Managers', 'Machinary'].includes(i.Category));
+            
+            // Filters
+            if(teh) data = data.filter(i => i.ParentTehsil === teh);
+            if(from || to) {
+                data = data.filter(i => {
+                    if(!i.Date) return false;
+                    const d = new Date(i.Date).setHours(0,0,0,0);
+                    const s = from ? new Date(from).setHours(0,0,0,0) : null;
+                    const e = to ? new Date(to).setHours(0,0,0,0) : null;
+                    return (!s || d >= s) && (!e || d <= e);
+                });
+            }
+
+            let income = 0, expense = 0;
+            $('#table-head').html(`<tr><th>Date</th><th>Category</th><th>Details</th><th>Tehsil</th><th>Debit (Exp)</th><th>Credit (Inc)</th></tr>`);
+            
+            let rowsHtml = data.map(row => {
+                let amt = parseFloat(row.Amount || 0);
+                let isInc = row.Category === 'Income';
+                if(isInc) income += amt; else expense += amt;
+
+                return `<tr>
+                    <td>${row.Date ? row.Date.split('T')[0] : '-'}</td>
+                    <td><span class="badge ${isInc ? 'bg-success' : 'bg-danger'}">${row.Category}</span></td>
+                    <td>${row.ManagerName || row.MachinaryName || ''} - ${row.Description}</td>
+                    <td>${row.ParentTehsil || '-'}</td>
+                    <td class="text-danger">${!isInc ? amt.toLocaleString() : '-'}</td>
+                    <td class="text-success">${isInc ? amt.toLocaleString() : '-'}</td>
+                </tr>`;
+            }).join('');
+
+            $('#table-body').html(rowsHtml);
+            $('#sum-income').text(income.toLocaleString());
+            $('#sum-expense').text(expense.toLocaleString());
+            $('#sum-balance').text((income - expense).toLocaleString());
         }
 
         function applyFilters() {
