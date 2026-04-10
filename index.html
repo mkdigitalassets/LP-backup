@@ -29,60 +29,88 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .logo { font-weight: bold; font-size: 1.2rem; }
-        .nav-links a { color: white; margin-left: 15px; text-decoration: none; cursor: pointer; opacity: 0.8; }
 
-        /* Container & Grid */
-        .container { padding: 2rem; }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
-
-        .card {
-            background: white; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-top: 4px solid var(--secondary);
+        .nav-links a {
+            color: white;
+            margin-left: 15px;
+            text-decoration: none;
+            cursor: pointer;
+            opacity: 0.8;
         }
 
+        .nav-links a:hover { opacity: 1; color: var(--secondary); }
+
+        /* Dashboard Grid */
+        .container { padding: 2rem; }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Card Styling (Apka Original Hover Effect) */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-top: 4px solid var(--secondary);
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .card i { font-size: 2.5rem; color: #6366f1; margin-bottom: 10px; display: block; font-style: normal; }
+        .card h3 { margin: 10px 0 5px; color: #1e293b; font-size: 1.1rem; }
+        .card p { color: #64748b; font-size: 0.85rem; margin: 0; }
+
+        /* Sections */
         .view-section { display: none; background: white; padding: 2rem; border-radius: 12px; }
         .active { display: block; }
 
         /* Form & Table */
-        .form-group { margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; margin-bottom: 5px; font-weight: 500; }
         input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; }
         th { background: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }
         td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
 
-        .btn { color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        /* Buttons */
+        .btn { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+        .btn:hover { opacity: 0.9; }
         .btn-back { background: #64748b; margin-bottom: 20px; }
 
-        /* PRINT HEADER - Screen pe hide rahega */
-        #print-header-wrapper { display: none; }
+        /* --- PRINT STYLING (Professional) --- */
+        #print-header { display: none; } /* Screen pe chhupa rahega */
 
-        /* PRINT CUSTOMIZATION */
         @media print {
+            nav, .btn, .btn-back, #form-container, #filter-container, .no-print, th:last-child, td:last-child {
+                display: none !important;
+            }
             body { background: white; }
-            nav, .btn, .btn-back, #form-container, #filter-container, .no-print { display: none !important; }
-            
             .container { padding: 0; }
             .view-section { display: block !important; padding: 0; border: none; }
-            
-            #print-header-wrapper { 
+            #print-header { 
                 display: block !important; 
-                margin-bottom: 20px; 
+                margin-bottom: 30px; 
                 border-bottom: 2px solid #333;
-                padding-bottom: 10px;
+                padding-bottom: 15px;
             }
-            
-            .print-header { display: flex; justify-content: space-between; align-items: center; }
-            .print-logo img { width: 60px; height: 60px; object-fit: contain; }
-            .print-title h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
-            
-            table { width: 100%; border: 1px solid #000; font-size: 12px; }
-            th, td { border: 1px solid #000; padding: 8px; }
-            th { background: #eee !important; color: #000 !important; }
+            .print-flex { display: flex; justify-content: space-between; align-items: center; }
+            table { width: 100%; border: 1px solid #000; }
+            th, td { border: 1px solid #000; padding: 8px; font-size: 12px; color: black; }
         }
     </style>
 </head>
@@ -92,13 +120,14 @@
         <div class="logo">ADMIN PANEL</div>
         <div class="nav-links">
             <a onclick="showHome()">Home</a>
-            <a>Logout</a>
+            <a>Change Password</a>
+            <a onclick="location.reload()">Logout</a>
         </div>
     </nav>
 
     <div class="container">
         <div id="home-section" class="view-section active">
-            <h2 style="text-align: center; color: #334155;">Admin Dashboard</h2>
+            <h2 style="text-align: center; color: #334155; margin-bottom: 30px;">Admin Dashboard</h2>
             <div class="dashboard-grid">
                 <div class="card" onclick="openCategory('Tehsils')"><i>📍</i><h3>Tehsils</h3><p>Manage Areas</p></div>
                 <div class="card" onclick="openCategory('Salary')"><i>💳</i><h3>Salary</h3><p>Payroll</p></div>
@@ -109,44 +138,31 @@
         <div id="category-section" class="view-section">
             <button class="btn btn-back" onclick="showHome()">← Back to Dashboard</button>
 
-            <div id="print-header-wrapper">
-                <div class="print-header">
-                    <div class="print-logo">
-                        <img src="https://via.placeholder.com/80?text=LOGO" alt="Logo">
+            <div id="print-header">
+                <div class="print-flex">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <img src="https://via.placeholder.com/60?text=LOGO" alt="Logo" style="width: 60px;">
+                        <div>
+                            <h1 style="margin:0; font-size: 22px;">OFFICIAL RECORD SYSTEM</h1>
+                            <p style="margin:0; font-size: 14px;">Management Department Report</p>
+                        </div>
                     </div>
-                    <div class="print-title" style="text-align: center;">
-                        <h1>OFFICIAL RECORD REPORT</h1>
-                        <p id="print-category-display" style="margin: 5px 0; font-weight: bold;"></p>
-                    </div>
-                    <div class="print-meta" style="text-align: right; font-size: 12px;">
-                        <p>Date: <span id="print-date"></span></p>
+                    <div style="text-align: right;">
+                        <p style="margin:0;"><strong>Report:</strong> <span id="print-cat-title"></span></p>
+                        <p style="margin:0;"><strong>Date:</strong> <span id="print-date-today"></span></p>
                     </div>
                 </div>
             </div>
 
-            <h2 id="current-title" style="color: #1e293b; margin-top: 0;">Category Name</h2>
-
-            <div id="form-container" style="display:none; max-width: 600px; margin: 20px auto; background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                <h3 id="form-action-title">Add New Record</h3>
-                <form id="dynamic-form">
-                    <input type="hidden" id="category-type" name="Category">
-                    <div class="form-group"><label id="label-id">ID</label><input type="text" name="ID" required></div>
-                    <div class="form-group" id="tehsil-select-group"><label>Select Tehsil</label><select name="ParentTehsil" id="tehsil-dropdown"></select></div>
-                    <div class="form-group"><label id="label-desc">Description</label><input type="text" name="Description" required></div>
-                    <div class="form-group" id="amount-group"><label>Amount</label><input type="number" name="Amount"></div>
-                    <div class="form-group" id="date-group"><label>Date</label><input type="date" name="Date"></div>
-                    <button type="submit" class="btn" id="submit-btn" style="width:100%; background: var(--success);">Save Record</button>
-                    <button type="button" onclick="toggleView('list')" class="btn" style="width:100%; background:#94a3b8; margin-top:10px;">Cancel</button>
-                </form>
-            </div>
+            <h2 id="current-title" style="color: #1e293b;">Category Name</h2>
 
             <div id="data-list-container">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="prepareNewRecord()" class="btn" style="background: #3b82f6;">+ Add New Record</button>
-                        <button onclick="generatePrint()" class="btn" style="background: #64748b;">🖨️ Print Report</button>
+                        <button onclick="prepareNewRecord()" class="btn" style="background: #3b82f6; font-weight: bold;">+ Add New Record</button>
+                        <button onclick="window.print()" class="btn" style="background: #64748b;">🖨️ Print Report</button>
                     </div>
-                    <button onclick="fetchListData()" class="btn" style="background: #2c3e50;">Refresh</button>
+                    <button onclick="fetchListData()" class="btn" style="background: #2c3e50;">Refresh Data</button>
                 </div>
 
                 <div id="filter-container" style="display:none; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; gap: 10px;">
@@ -163,6 +179,26 @@
                         <tbody id="table-body"></tbody>
                     </table>
                 </div>
+            </div>
+
+            <div id="form-container" style="display:none; max-width: 600px; margin: 20px auto; background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:20px;">
+                    <h3 id="form-action-title" style="margin:0;">Add New Record</h3>
+                    <button onclick="toggleView('list')" class="btn" style="background:#94a3b8; padding:5px 12px; font-size:12px;">Cancel</button>
+                </div>
+                <form id="dynamic-form">
+                    <input type="hidden" id="category-type" name="Category">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group"><label id="label-id">ID</label><input type="text" name="ID" required></div>
+                        <div class="form-group" id="tehsil-select-group"><label>Tehsil</label><select name="ParentTehsil" id="tehsil-dropdown"></select></div>
+                    </div>
+                    <div class="form-group"><label id="label-desc">Description</label><input type="text" name="Description" required></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group" id="amount-group"><label>Amount</label><input type="number" name="Amount"></div>
+                        <div class="form-group" id="date-group"><label>Date</label><input type="date" name="Date"></div>
+                    </div>
+                    <button type="submit" class="btn" id="submit-btn" style="width:100%; font-weight:bold;">Save Record</button>
+                </form>
             </div>
         </div>
     </div>
@@ -187,6 +223,8 @@
             document.getElementById('home-section').classList.remove('active');
             document.getElementById('category-section').classList.add('active');
             document.getElementById('current-title').innerText = name + " Management";
+            document.getElementById('print-cat-title').innerText = name;
+            document.getElementById('print-date-today').innerText = new Date().toLocaleDateString();
             document.getElementById('category-type').value = name;
 
             const isTehsil = (name === 'Tehsils');
@@ -203,7 +241,7 @@
 
         function fetchListData() {
             const tbody = document.getElementById('table-body');
-            tbody.innerHTML = "<tr><td colspan='10' style='text-align:center;'>Loading...</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='10' style='text-align:center;'>Loading records...</td></tr>";
             fetch(scriptURL).then(res => res.json()).then(data => {
                 allData = data;
                 updateTehsilDropdowns();
@@ -218,7 +256,7 @@
             if (!data.length) { tbody.innerHTML = "<tr><td colspan='10'>No Data</td></tr>"; return; }
 
             const headers = Object.keys(data[0]).filter(h => h !== 'rowNum' && h !== 'Category');
-            thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}<th class="no-print">Actions</th></tr>`;
+            thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}<th>Actions</th></tr>`;
             
             let total = 0;
             let rowsHtml = data.map(row => {
@@ -228,35 +266,20 @@
                     if (h === 'Amount' && val) total += parseFloat(val) || 0;
                     return `<td>${val}</td>`;
                 }).join('')}
-                <td class="no-print">
-                    <button onclick='editRecord(${JSON.stringify(row)})' style='background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px;'>Edit</button>
-                </td></tr>`;
+                <td><button onclick='editRecord(${JSON.stringify(row)})' class='btn' style='padding:4px 8px; font-size:12px; background:#3b82f6;'>Edit</button></td></tr>`;
             }).join('');
 
-            // TOTAL ROW
-            let totalRow = `<tr style="background:#f1f5f9; font-weight:bold;">
-                <td colspan="${headers.indexOf('Amount') || 0}" style="text-align:right;">GRAND TOTAL:</td>
-                <td>${total.toLocaleString()}</td>
-                <td colspan="10"></td>
-            </tr>`;
-
+            let totalRow = `<tr style="background:#f1f5f9; font-weight:bold;"><td colspan="${headers.indexOf('Amount') || 0}" style="text-align:right;">TOTAL:</td><td>${total.toLocaleString()}</td><td></td></tr>`;
             tbody.innerHTML = rowsHtml + (currentCategory !== 'Tehsils' ? totalRow : "");
-        }
-
-        // PRINT FUNCTION
-        function generatePrint() {
-            document.getElementById('print-date').innerText = new Date().toLocaleDateString();
-            document.getElementById('print-category-display').innerText = "Report For: " + currentCategory;
-            window.print();
         }
 
         function prepareNewRecord() { resetFormState(); toggleView('form'); }
 
         function updateTehsilDropdowns() {
-            const tehsils = allData.filter(item => item.Category === 'Tehsils');
-            let options = '<option value="">Select Tehsil</option>' + tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join('');
-            document.getElementById('tehsil-dropdown').innerHTML = options;
-            document.getElementById('filter-tehsil').innerHTML = '<option value="">All Tehsils</option>' + options;
+            const tehsils = allData.filter(i => i.Category === 'Tehsils');
+            let opts = '<option value="">Select Tehsil</option>' + tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join('');
+            document.getElementById('tehsil-dropdown').innerHTML = opts;
+            document.getElementById('filter-tehsil').innerHTML = '<option value="">All Tehsils</option>' + opts;
         }
 
         function resetFormState() {
@@ -274,7 +297,7 @@
             let fd = new FormData(this);
             if (isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); }
             fetch(scriptURL, { method: 'POST', body: fd }).then(() => {
-                alert("Saved!"); toggleView('list'); fetchListData();
+                alert("Success!"); toggleView('list'); fetchListData();
             }).catch(() => { btn.disabled = false; });
         });
 
