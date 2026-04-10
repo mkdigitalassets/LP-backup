@@ -1,343 +1,495 @@
+choro isko tum asa kro is code me kr k do bilkul clean list py headin k nichy jahan add ka button hoga na wahan py print k wala button add krna hy or print ko customize krna hy usme meny apna logo lgana hy or usme jis chz ka hum print nikaal rhy hen wo show hona chahiye k is chz ka nikaal rhy or end me total b 
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel Dashboard</title>
 
-    <style>
-        :root {
-            --primary: #1e293b;
-            --secondary: #3b82f6;
-            --success: #22c55e;
-            --bg: #f1f5f9;
-        }
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #3b82f6;
+            --success: #22c55e;
+            --bg: #f1f5f9;
+        }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            background: var(--bg);
-        }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--bg);
+        }
 
-        /* Navbar */
-        nav {
-            background: var(--primary);
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        /* Navbar */
+        nav {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
 
-        .logo { font-weight: bold; font-size: 1.2rem; }
+        .logo {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
 
-        .nav-links a {
-            color: white;
-            margin-left: 15px;
-            text-decoration: none;
-            cursor: pointer;
-            opacity: 0.8;
-        }
+        .nav-links a {
+            color: white;
+            margin-left: 15px;
+            text-decoration: none;
+            cursor: pointer;
+            opacity: 0.8;
+        }
 
-        .nav-links a:hover { opacity: 1; color: var(--secondary); }
+        .nav-links a:hover {
+            opacity: 1;
+            color: var(--secondary);
+        }
 
-        /* Dashboard Grid */
-        .container { padding: 2rem; }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-        }
+        /* Dashboard Grid */
+        .container {
+            padding: 2rem;
+        }
 
-        /* Card Styling (Apka Original Hover Effect) */
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            border-top: 4px solid var(--secondary);
-            position: relative;
-        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        }
+        /* Card Styling */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-top: 4px solid var(--secondary);
+            position: relative;
+        }
 
-        .card i { font-size: 2.5rem; color: #6366f1; margin-bottom: 10px; display: block; font-style: normal; }
-        .card h3 { margin: 10px 0 5px; color: #1e293b; font-size: 1.1rem; }
-        .card p { color: #64748b; font-size: 0.85rem; margin: 0; }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
 
-        /* Sections */
-        .view-section { display: none; background: white; padding: 2rem; border-radius: 12px; }
-        .active { display: block; }
+        .card i {
+            font-size: 2.5rem;
+            color: #6366f1;
+            margin-bottom: 10px;
+            display: block;
+            font-style: normal;
+        }
 
-        /* Form & Table */
-        .form-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; margin-bottom: 5px; font-weight: 500; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .card h3 {
+            margin: 10px 0 5px;
+            color: #1e293b;
+            font-size: 1.1rem;
+        }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        .card p {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin: 0;
+        }
 
-        /* Buttons */
-        .btn { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
-        .btn:hover { opacity: 0.9; }
-        .btn-back { background: #64748b; margin-bottom: 20px; }
+        /* Sections */
+        .view-section {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+        }
 
-        /* --- PRINT STYLING (Professional) --- */
-        #print-header { display: none; } /* Screen pe chhupa rahega */
+        .active {
+            display: block;
+        }
 
-        @media print {
-            nav, .btn, .btn-back, #form-container, #filter-container, .no-print, th:last-child, td:last-child {
-                display: none !important;
-            }
-            body { background: white; }
-            .container { padding: 0; }
-            .view-section { display: block !important; padding: 0; border: none; }
-            #print-header { 
-                display: block !important; 
-                margin-bottom: 30px; 
-                border-bottom: 2px solid #333;
-                padding-bottom: 15px;
-            }
-            .print-flex { display: flex; justify-content: space-between; align-items: center; }
-            table { width: 100%; border: 1px solid #000; }
-            th, td { border: 1px solid #000; padding: 8px; font-size: 12px; color: black; }
-        }
-    </style>
+        /* Form */
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-back {
+            background: #64748b;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .nav-links { margin-top: 10px; }
+            .nav-links a { margin-left: 0; margin-right: 15px; }
+        }
+    </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">ADMIN PANEL</div>
-        <div class="nav-links">
-            <a onclick="showHome()">Home</a>
-            <a>Change Password</a>
-            <a onclick="location.reload()">Logout</a>
-        </div>
-    </nav>
+    <nav>
+        <div class="logo">ADMIN PANEL</div>
+        <div class="nav-links">
+            <a onclick="showHome()">Home</a>
+            <a>Change Password</a>
+            <a>Logout</a>
+        </div>
+    </nav>
 
-    <div class="container">
-        <div id="home-section" class="view-section active">
-            <h2 style="text-align: center; color: #334155; margin-bottom: 30px;">Admin Dashboard</h2>
-            <div class="dashboard-grid">
-                <div class="card" onclick="openCategory('Tehsils')"><i>📍</i><h3>Tehsils</h3><p>Manage Areas</p></div>
-                <div class="card" onclick="openCategory('Salary')"><i>💳</i><h3>Salary</h3><p>Payroll</p></div>
-                <div class="card" onclick="openCategory('Income')"><i>💰</i><h3>Income</h3><p>Revenue</p></div>
-            </div>
-        </div>
+    <div class="container">
+        <div id="home-section" class="view-section active">
+            <h2 style="text-align: center; color: #334155;">Admin Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="card" onclick="openCategory('Tehsils')"><i>📍</i><h3>Tehsils</h3><p>Manage Areas</p></div>
+                <div class="card" onclick="openCategory('Salary')"><i>💳</i><h3>Salary</h3><p>Payroll</p></div>
+                <div class="card" onclick="openCategory('Income')"><i>💰</i><h3>Income</h3><p>Revenue</p></div>
+            </div>
+        </div>
 
-        <div id="category-section" class="view-section">
-            <button class="btn btn-back" onclick="showHome()">← Back to Dashboard</button>
+        <div id="category-section" class="view-section">
+            <button class="btn btn-back" onclick="showHome()">← Back to Dashboard</button>
+            <h2 id="current-title" style="color: #1e293b;">Category Name</h2>
 
-            <div id="print-header">
-                <div class="print-flex">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <img src="https://via.placeholder.com/60?text=LOGO" alt="Logo" style="width: 60px;">
-                        <div>
-                            <h1 style="margin:0; font-size: 22px;">OFFICIAL RECORD SYSTEM</h1>
-                            <p style="margin:0; font-size: 14px;">Management Department Report</p>
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <p style="margin:0;"><strong>Report:</strong> <span id="print-cat-title"></span></p>
-                        <p style="margin:0;"><strong>Date:</strong> <span id="print-date-today"></span></p>
-                    </div>
-                </div>
-            </div>
+            <div id="form-container" style="display:none; max-width: 600px; margin: 20px auto; background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:20px;">
+                    <h3 id="form-action-title" style="margin:0;">Add New Record</h3>
+                    <button onclick="toggleView('list')" class="btn" style="background:#94a3b8; padding:5px 12px; font-size:12px;">Cancel</button>
+                </div>
 
-            <h2 id="current-title" style="color: #1e293b;">Category Name</h2>
+                <form id="dynamic-form">
+                    <input type="hidden" id="category-type" name="Category">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label id="label-id">ID</label>
+                            <input type="text" name="ID" required>
+                        </div>
+                        <div class="form-group" id="tehsil-select-group">
+                            <label>Select Tehsil</label>
+                            <select name="ParentTehsil" id="tehsil-dropdown"></select>
+                        </div>
+                    </div>
 
-            <div id="data-list-container">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="prepareNewRecord()" class="btn" style="background: #3b82f6; font-weight: bold;">+ Add New Record</button>
-                        <button onclick="window.print()" class="btn" style="background: #64748b;">🖨️ Print Report</button>
-                    </div>
-                    <button onclick="fetchListData()" class="btn" style="background: #2c3e50;">Refresh Data</button>
-                </div>
+                    <div class="form-group">
+                        <label id="label-desc">Description</label>
+                        <input type="text" name="Description" required>
+                    </div>
 
-                <div id="filter-container" style="display:none; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; gap: 10px;">
-                    <select id="filter-tehsil" style="flex:1"></select>
-                    <input type="date" id="filter-from-date" style="flex:1">
-                    <input type="date" id="filter-to-date" style="flex:1">
-                    <button onclick="applyFilters()" class="btn" style="background: #3b82f6;">Apply</button>
-                    <button onclick="resetFilters()" class="btn" style="background: #64748b;">Reset</button>
-                </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group" id="amount-group">
+                            <label>Amount</label>
+                            <input type="number" name="Amount">
+                        </div>
+                        <div class="form-group" id="date-group">
+                            <label>Date</label>
+                            <input type="date" name="Date">
+                        </div>
+                    </div>
 
-                <div style="overflow-x:auto;">
-                    <table id="category-table">
-                        <thead id="table-head"></thead>
-                        <tbody id="table-body"></tbody>
-                    </table>
-                </div>
-            </div>
+                    <button type="submit" class="btn" id="submit-btn" style="width:100%; font-weight:bold;">Save Record</button>
+                </form>
+            </div>
 
-            <div id="form-container" style="display:none; max-width: 600px; margin: 20px auto; background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:20px;">
-                    <h3 id="form-action-title" style="margin:0;">Add New Record</h3>
-                    <button onclick="toggleView('list')" class="btn" style="background:#94a3b8; padding:5px 12px; font-size:12px;">Cancel</button>
-                </div>
-                <form id="dynamic-form">
-                    <input type="hidden" id="category-type" name="Category">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group"><label id="label-id">ID</label><input type="text" name="ID" required></div>
-                        <div class="form-group" id="tehsil-select-group"><label>Tehsil</label><select name="ParentTehsil" id="tehsil-dropdown"></select></div>
-                    </div>
-                    <div class="form-group"><label id="label-desc">Description</label><input type="text" name="Description" required></div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group" id="amount-group"><label>Amount</label><input type="number" name="Amount"></div>
-                        <div class="form-group" id="date-group"><label>Date</label><input type="date" name="Date"></div>
-                    </div>
-                    <button type="submit" class="btn" id="submit-btn" style="width:100%; font-weight:bold;">Save Record</button>
-                </form>
-            </div>
-        </div>
-    </div>
+            <div id="data-list-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <button onclick="prepareNewRecord()" class="btn" style="background: #3b82f6; font-weight: bold;">+ Add New Record</button>
+                    <button onclick="fetchListData()" class="btn" style="background: #2c3e50; padding: 8px 15px; font-size: 13px;">Refresh Data</button>
+                </div>
 
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbz3AFsk31Y5aEV8Ka_FJ28SfvFJQZPp0k71EfZBfWUJzExv7c3zb-lWUadJ_TY7KcfK5g/exec';
-        let currentCategory = "", allData = [], filteredCategoryData = [], isEditing = false, editRowNum = null;
+                <div id="filter-container" style="display:none; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; align-items: flex-end;">
+                    <div style="flex: 1; min-width: 140px;">
+                        <label style="font-size: 11px; font-weight: bold; color: #64748b;">TEHSIL</label>
+                        <select id="filter-tehsil" style="padding: 8px;"></select>
+                    </div>
+                    <div style="flex: 1; min-width: 140px;">
+                        <label style="font-size: 11px; font-weight: bold; color: #64748b;">FROM DATE</label>
+                        <input type="date" id="filter-from-date" style="padding: 8px;">
+                    </div>
+                    <div style="flex: 1; min-width: 140px;">
+                        <label style="font-size: 11px; font-weight: bold; color: #64748b;">TO DATE</label>
+                        <input type="date" id="filter-to-date" style="padding: 8px;">
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="applyFilters()" class="btn" style="padding: 8px 15px; background: #3b82f6;">Apply</button>
+                        <button onclick="resetFilters()" class="btn" style="padding: 8px 15px; background: #64748b;">Reset</button>
+                    </div>
+                </div>
 
-        function toggleView(view) {
-            document.getElementById('form-container').style.display = (view === 'form' ? 'block' : 'none');
-            document.getElementById('data-list-container').style.display = (view === 'list' ? 'block' : 'none');
-        }
+                <div style="overflow-x:auto; background: white; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <table id="category-table">
+                        <thead id="table-head"></thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        function showHome() {
-            document.getElementById('category-section').classList.remove('active');
-            document.getElementById('home-section').classList.add('active');
-        }
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz3AFsk31Y5aEV8Ka_FJ28SfvFJQZPp0k71EfZBfWUJzExv7c3zb-lWUadJ_TY7KcfK5g/exec';
 
-        function openCategory(name) {
-            currentCategory = name;
-            toggleView('list');
-            document.getElementById('home-section').classList.remove('active');
-            document.getElementById('category-section').classList.add('active');
-            document.getElementById('current-title').innerText = name + " Management";
-            document.getElementById('print-cat-title').innerText = name;
-            document.getElementById('print-date-today').innerText = new Date().toLocaleDateString();
-            document.getElementById('category-type').value = name;
+        let currentCategory = "";
+        let allData = [];
+        let filteredCategoryData = [];
+        let isEditing = false;
+        let editRowNum = null;
 
-            const isTehsil = (name === 'Tehsils');
-            document.getElementById('tehsil-select-group').style.display = isTehsil ? 'none' : 'block';
-            document.getElementById('amount-group').style.display = isTehsil ? 'none' : 'block';
-            document.getElementById('date-group').style.display = isTehsil ? 'none' : 'block';
-            document.getElementById('filter-container').style.display = isTehsil ? 'none' : 'flex';
-            
-            document.getElementById('label-id').innerText = name + " ID";
-            document.getElementById('label-desc').innerText = (name === 'Salary' ? "Employee Name" : "Description");
+        function toggleView(view) {
+            if (view === 'form') {
+                document.getElementById('form-container').style.display = 'block';
+                document.getElementById('data-list-container').style.display = 'none';
+            } else {
+                document.getElementById('form-container').style.display = 'none';
+                document.getElementById('data-list-container').style.display = 'block';
+            }
+        }
 
-            fetchListData();
-        }
+        function showHome() {
+            document.getElementById('category-section').classList.remove('active');
+            document.getElementById('home-section').classList.add('active');
+            resetFormState();
+        }
 
-        function fetchListData() {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = "<tr><td colspan='10' style='text-align:center;'>Loading records...</td></tr>";
-            fetch(scriptURL).then(res => res.json()).then(data => {
-                allData = data;
-                updateTehsilDropdowns();
-                filteredCategoryData = data.filter(item => item.Category === currentCategory);
-                renderTable(filteredCategoryData);
-            });
-        }
+        function openCategory(name) {
+            currentCategory = name;
+            toggleView('list');
+            document.getElementById('home-section').classList.remove('active');
+            document.getElementById('category-section').classList.add('active');
+            document.getElementById('current-title').innerText = name + " Management";
+            document.getElementById('category-type').value = name;
 
-        function renderTable(data) {
-            const tbody = document.getElementById('table-body');
-            const thead = document.getElementById('table-head');
-            if (!data.length) { tbody.innerHTML = "<tr><td colspan='10'>No Data</td></tr>"; return; }
+            const tehsilGroup = document.getElementById('tehsil-select-group');
+            const amountGroup = document.getElementById('amount-group');
+            const dateGroup = document.getElementById('date-group');
+            const filterContainer = document.getElementById('filter-container');
 
-            const headers = Object.keys(data[0]).filter(h => h !== 'rowNum' && h !== 'Category');
-            thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}<th>Actions</th></tr>`;
-            
-            let total = 0;
-            let rowsHtml = data.map(row => {
-                return `<tr>${headers.map(h => {
-                    let val = row[h] || '';
-                    if (h === 'Date' && val) val = val.split('T')[0];
-                    if (h === 'Amount' && val) total += parseFloat(val) || 0;
-                    return `<td>${val}</td>`;
-                }).join('')}
-                <td><button onclick='editRecord(${JSON.stringify(row)})' class='btn' style='padding:4px 8px; font-size:12px; background:#3b82f6;'>Edit</button></td></tr>`;
-            }).join('');
+            resetFormState();
 
-            let totalRow = `<tr style="background:#f1f5f9; font-weight:bold;"><td colspan="${headers.indexOf('Amount') || 0}" style="text-align:right;">TOTAL:</td><td>${total.toLocaleString()}</td><td></td></tr>`;
-            tbody.innerHTML = rowsHtml + (currentCategory !== 'Tehsils' ? totalRow : "");
-        }
+            if (name === 'Tehsils') {
+                tehsilGroup.style.display = 'none';
+                amountGroup.style.display = 'none';
+                dateGroup.style.display = 'none';
+                filterContainer.style.display = 'none';
+                document.getElementById('label-id').innerText = "Tehsil ID";
+                document.getElementById('label-desc').innerText = "Tehsil Name";
+            } else {
+                tehsilGroup.style.display = 'block';
+                amountGroup.style.display = 'block';
+                dateGroup.style.display = 'block';
+                filterContainer.style.display = 'flex';
+                document.getElementById('label-id').innerText = name + " ID";
+                document.getElementById('label-desc').innerText = (name === 'Salary' ? "Employee Name" : "Description");
+            }
+            fetchListData();
+        }
 
-        function prepareNewRecord() { resetFormState(); toggleView('form'); }
+        function prepareNewRecord() {
+            resetFormState();
+            document.getElementById('form-action-title').innerText = "Add Record to " + currentCategory;
+            toggleView('form');
+        }
 
-        function updateTehsilDropdowns() {
-            const tehsils = allData.filter(i => i.Category === 'Tehsils');
-            let opts = '<option value="">Select Tehsil</option>' + tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join('');
-            document.getElementById('tehsil-dropdown').innerHTML = opts;
-            document.getElementById('filter-tehsil').innerHTML = '<option value="">All Tehsils</option>' + opts;
-        }
+        function updateTehsilDropdowns() {
+            const tehsils = allData.filter(item => item.Category === 'Tehsils');
+            let optionsHtml = tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join('');
+            document.getElementById('tehsil-dropdown').innerHTML = '<option value="">Select Tehsil</option>' + optionsHtml;
+            document.getElementById('filter-tehsil').innerHTML = '<option value="">All Tehsils</option>' + optionsHtml;
+        }
 
-        function resetFormState() {
-            isEditing = false; editRowNum = null;
-            document.getElementById('dynamic-form').reset();
-            document.getElementById('category-type').value = currentCategory;
-            document.getElementById('submit-btn').innerText = "Save Record";
-            document.getElementById('submit-btn').style.background = "#22c55e";
-        }
+        function fetchListData() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = "<tr><td colspan='10' style='padding:20px; text-align:center;'>Loading records...</td></tr>";
 
-        document.getElementById('dynamic-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('submit-btn');
-            btn.disabled = true; btn.innerText = "Processing...";
-            let fd = new FormData(this);
-            if (isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); }
-            fetch(scriptURL, { method: 'POST', body: fd }).then(() => {
-                alert("Success!"); toggleView('list'); fetchListData();
-            }).catch(() => { btn.disabled = false; });
-        });
+            fetch(scriptURL)
+                .then(res => res.json())
+                .then(data => {
+                    allData = data;
+                    updateTehsilDropdowns();
+                    filteredCategoryData = data.filter(item => item.Category === currentCategory);
+                    renderTable(filteredCategoryData);
+                })
+                .catch(err => {
+                    tbody.innerHTML = "<tr><td colspan='10' style='padding:20px; text-align:center;'>Error loading data.</td></tr>";
+                });
+        }
 
-        function editRecord(data) {
-            isEditing = true; editRowNum = data.rowNum;
-            const f = document.getElementById('dynamic-form');
-            f.querySelector('[name="ID"]').value = data.ID || '';
-            f.querySelector('[name="Description"]').value = data.Description || '';
-            if (data.Amount) f.querySelector('[name="Amount"]').value = data.Amount;
-            if (data.Date) f.querySelector('[name="Date"]').value = data.Date.split('T')[0];
-            if (data.ParentTehsil) document.getElementById('tehsil-dropdown').value = data.ParentTehsil;
-            document.getElementById('submit-btn').innerText = "Update Record";
-            document.getElementById('submit-btn').style.background = "#f59e0b";
-            toggleView('form');
-        }
+        function renderTable(dataToDisplay) {
+            const tbody = document.getElementById('table-body');
+            const thead = document.getElementById('table-head');
+            if (dataToDisplay.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='10' style='padding:20px; text-align:center;'>No records found.</td></tr>";
+                return;
+            }
 
-        function applyFilters() {
-            const teh = document.getElementById('filter-tehsil').value;
-            const from = document.getElementById('filter-from-date').value;
-            const to = document.getElementById('filter-to-date').value;
-            let res = filteredCategoryData;
-            if (teh) res = res.filter(i => i.ParentTehsil === teh);
-            if (from || to) {
-                res = res.filter(i => {
-                    if (!i.Date) return false;
-                    const d = new Date(i.Date).setHours(0,0,0,0);
-                    const s = from ? new Date(from).setHours(0,0,0,0) : null;
-                    const e = to ? new Date(to).setHours(23,59,59,999) : null;
-                    return (!s || d >= s) && (!e || d <= e);
-                });
-            }
-            renderTable(res);
-        }
+            const headers = Object.keys(dataToDisplay[0]).filter(h => h !== 'rowNum');
+            thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}<th>Actions</th></tr>`;
+            
+            let totalAmount = 0;
+            let rowsHtml = dataToDisplay.map(row => {
+                return `<tr>${headers.map(h => {
+                    let value = row[h] || '';
+                    if (h === 'Date' && value !== '') value = value.toString().split('T')[0].split(' ')[0];
+                    if (h === 'Amount' && value !== '') totalAmount += parseFloat(value) || 0;
+                    return `<td>${value}</td>`;
+                }).join('')}
+                <td>
+                    <button onclick='editRecord(${JSON.stringify(row)})' style='background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;'>Edit</button>
+                    <button onclick='deleteRecord(${row.rowNum})' style='background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;'>Del</button>
+                </td></tr>`;
+            }).join('');
 
-        function resetFilters() {
-            document.getElementById('filter-tehsil').value = "";
-            document.getElementById('filter-from-date').value = "";
-            document.getElementById('filter-to-date').value = "";
-            renderTable(filteredCategoryData);
-        }
-    </script>
+            // Total Row
+            let totalRowHtml = `<tr style="background-color: #f1f5f9; font-weight: bold;">`;
+            headers.forEach((h, index) => {
+                if (index === 0) totalRowHtml += `<td colspan="${headers.indexOf('Amount') || 1}" style="text-align: right;">GRAND TOTAL:</td>`;
+                else if (h === 'Amount') totalRowHtml += `<td>${totalAmount.toLocaleString()}</td>`;
+                else if (headers.indexOf(h) > headers.indexOf('Amount')) totalRowHtml += `<td></td>`;
+            });
+            totalRowHtml += `<td></td></tr>`;
+
+            tbody.innerHTML = rowsHtml + totalRowHtml;
+        }
+
+        function deleteRecord(rowNum) {
+            if (!confirm("Delete this record?")) return;
+            let fd = new FormData(); fd.append('action', 'DELETE'); fd.append('rowNum', rowNum);
+            fetch(scriptURL, { method: 'POST', body: fd })
+            .then(res => res.json()).then(() => { alert("Deleted!"); fetchListData(); });
+        }
+
+        function editRecord(data) {
+            isEditing = true;
+            editRowNum = data.rowNum;
+            const form = document.getElementById('dynamic-form');
+            form.querySelector('[name="ID"]').value = data.ID || '';
+            form.querySelector('[name="Description"]').value = data.Description || '';
+            if (data.Amount) form.querySelector('[name="Amount"]').value = data.Amount;
+            if (data.Date) form.querySelector('[name="Date"]').value = data.Date.split('T')[0];
+            if (data.ParentTehsil) document.getElementById('tehsil-dropdown').value = data.ParentTehsil;
+
+            document.getElementById('form-action-title').innerText = "Edit Record";
+            document.getElementById('submit-btn').innerText = "Update Record";
+            document.getElementById('submit-btn').style.background = "#f59e0b";
+            toggleView('form');
+        }
+
+        function resetFormState() {
+            isEditing = false;
+            editRowNum = null;
+            document.getElementById('dynamic-form').reset();
+            document.getElementById('category-type').value = currentCategory;
+            document.getElementById('submit-btn').innerText = "Save Record";
+            document.getElementById('submit-btn').style.background = "#22c55e";
+            document.getElementById('submit-btn').disabled = false;
+        }
+
+        document.getElementById('dynamic-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true; btn.innerText = "Processing...";
+            let formData = new FormData(this);
+            if (isEditing) { formData.append('action', 'UPDATE'); formData.append('rowNum', editRowNum); }
+
+            fetch(scriptURL, { method: 'POST', body: formData })
+            .then(res => res.json()).then(() => {
+                alert("Success!");
+                resetFormState();
+                toggleView('list');
+                fetchListData();
+            }).catch(err => { alert("Error!"); btn.disabled = false; });
+        });
+
+        function applyFilters() {
+            const tehsilValue = document.getElementById('filter-tehsil').value;
+            const fromDate = document.getElementById('filter-from-date').value;
+            const toDate = document.getElementById('filter-to-date').value;
+            let result = filteredCategoryData;
+
+            if (tehsilValue) result = result.filter(item => item.ParentTehsil === tehsilValue);
+            if (fromDate || toDate) {
+                result = result.filter(item => {
+                    if (!item.Date) return false;
+                    const itemDate = new Date(item.Date); itemDate.setHours(0,0,0,0);
+                    const start = fromDate ? new Date(fromDate) : null;
+                    const end = toDate ? new Date(toDate) : null;
+                    if (start) start.setHours(0,0,0,0);
+                    if (end) end.setHours(23,59,59,999);
+                    if (start && end) return itemDate >= start && itemDate <= end;
+                    if (start) return itemDate >= start;
+                    if (end) return itemDate <= end;
+                    return true;
+                });
+            }
+            renderTable(result);
+        }
+
+        function resetFilters() {
+            document.getElementById('filter-tehsil').value = "";
+            document.getElementById('filter-from-date').value = "";
+            document.getElementById('filter-to-date').value = "";
+            renderTable(filteredCategoryData);
+        }
+    </script>
 </body>
 </html>
