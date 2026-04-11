@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Stable Version</title>
+    <title>Admin Panel - Secured & Updated</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { background-color: #f4f7fa; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f4f7fa; font-family: 'Segoe UI', sans-serif; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
         .navbar { background-color: #1e293b !important; border-bottom: 3px solid #3b82f6; }
         .main-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; }
         .card-custom { transition: all 0.3s ease; border: none; border-top: 5px solid #0d6efd; cursor: pointer; border-radius: 12px; }
@@ -29,6 +29,7 @@
         .bg-income { background: #22c55e; }
         .bg-expense { background: #ef4444; }
         .bg-balance { background: #3b82f6; }
+        .bg-tehsil-card { background: #ffffff; border-left: 5px solid #6366f1 !important; }
 
         @media print {
             .no-print, .navbar, .btn, #form-container, #home-section, #filter-container, #login-overlay { display: none !important; }
@@ -39,9 +40,7 @@
         }
     </style>
 </head>
-<body>
-
-    <div id="login-overlay">
+<body oncontextmenu="return false;"> <div id="login-overlay">
         <div class="login-box shadow-lg">
             <div class="text-center mb-4">
                 <i class="fas fa-user-lock fa-3x text-primary mb-2"></i>
@@ -84,10 +83,7 @@
                 </div>
 
                 <div id="summary-highlights" class="row g-3 no-print mb-4" style="display:none;">
-                    <div class="col-md-4"><div class="summary-box bg-income"><h6>Total Income</h6><h3 id="sum-income">0</h3></div></div>
-                    <div class="col-md-4"><div class="summary-box bg-expense"><h6>Total Expenses</h6><h3 id="sum-expense">0</h3></div></div>
-                    <div class="col-md-4"><div class="summary-box bg-balance"><h6>Remaining Balance</h6><h3 id="sum-balance">0</h3></div></div>
-                </div>
+                    </div>
 
                 <div id="form-container" class="mb-5 no-print p-4 border rounded-3 bg-white shadow-sm" style="display:none; border-top: 4px solid #22c55e !important;">
                     <form id="dynamic-form">
@@ -153,6 +149,16 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+        // --- SECURITY SCRIPT ---
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) return false; // F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Inspect
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Element
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Console
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // View Source
+            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; // Save
+        };
+
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwJSO8noWDGy_kpY4SZQxi4oI8B3QkrayqfoqKamd9j563Fb_szRk0IkIADHtldvLxSpg/exec';
         let currentUser = { role: '', name: '' }, allData = [], currentCategory = "";
         const adminUser = "admin", adminPass = "12345";
@@ -274,8 +280,6 @@
 
         function deleteRecord(rowNum) {
             if(confirm("Are you sure you want to delete this record?")) {
-                const btn = event.target.closest('button');
-                btn.disabled = true;
                 const fd = new FormData();
                 fd.append('action', 'DELETE');
                 fd.append('rowNum', rowNum);
@@ -286,6 +290,7 @@
         function generateFinalReport() {
             const teh = $('#filter-tehsil').val(), from = $('#filter-from').val(), to = $('#filter-to').val();
             let data = allData.filter(i => !['Tehsils', 'Managers', 'Machinary'].includes(i.Category));
+            
             if(teh) data = data.filter(i => i.ParentTehsil === teh);
             if(from || to) {
                 data = data.filter(i => {
@@ -294,15 +299,54 @@
                     return (!s || d >= s) && (!e || d <= e);
                 });
             }
+
             let inc = 0, exp = 0;
+            let tehStats = {}; // To hold tehsil wise calculations
+
             $('#table-head').html(`<tr><th>Date</th><th>Category</th><th>Details</th><th>Tehsil</th><th>Debit (Exp)</th><th>Credit (Inc)</th></tr>`);
+            
             let rows = data.map(row => {
                 let amt = parseFloat(row.Amount || 0), isInc = row.Category === 'Income';
-                isInc ? inc += amt : exp += amt;
-                return `<tr><td>${row.Date ? row.Date.split('T')[0] : '-'}</td><td><span class="badge ${isInc?'bg-success':'bg-danger'}">${row.Category}</span></td><td>${row.ManagerName || row.MachinaryName || ''} ${row.Description}</td><td>${row.ParentTehsil || '-'}</td><td class="text-danger">${!isInc?amt.toLocaleString():'-'}</td><td class="text-success">${isInc?amt.toLocaleString():'-'}</td></tr>`;
+                let tName = row.ParentTehsil || "General";
+
+                if(!tehStats[tName]) tehStats[tName] = { income: 0, expense: 0 };
+                if(isInc) { inc += amt; tehStats[tName].income += amt; } 
+                else { exp += amt; tehStats[tName].expense += amt; }
+
+                return `<tr>
+                    <td>${row.Date ? row.Date.split('T')[0] : '-'}</td>
+                    <td><span class="badge ${isInc?'bg-success':'bg-danger'}">${row.Category}</span></td>
+                    <td>${row.ManagerName || row.MachinaryName || ''} ${row.Description}</td>
+                    <td>${tName}</td>
+                    <td class="text-danger">${!isInc?amt.toLocaleString():'-'}</td>
+                    <td class="text-success">${isInc?amt.toLocaleString():'-'}</td>
+                </tr>`;
             }).join('');
+
+            // Build Tehsil Summary Cards
+            let tehHtml = `<div class="col-12 mt-4 mb-2"><h5 class="fw-bold border-bottom pb-2">Tehsil Summary (Income - Expenses)</h5></div>`;
+            for (let t in tehStats) {
+                let bal = tehStats[t].income - tehStats[t].expense;
+                tehHtml += `
+                    <div class="col-md-4 mb-3">
+                        <div class="card p-3 shadow-sm bg-tehsil-card border-0">
+                            <h6 class="fw-bold text-primary mb-1">${t}</h6>
+                            <div class="d-flex justify-content-between small text-muted"><span>Inc: ${tehStats[t].income.toLocaleString()}</span><span>Exp: ${tehStats[t].expense.toLocaleString()}</span></div>
+                            <div class="mt-2 pt-2 border-top d-flex justify-content-between">
+                                <strong>Balance:</strong> <strong class="${bal >=0 ? 'text-success' : 'text-danger'}">${bal.toLocaleString()}</strong>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
             $('#table-body').html(rows || "<tr><td colspan='6' class='text-center'>No data for selected filters</td></tr>");
-            $('#sum-income').text(inc.toLocaleString()); $('#sum-expense').text(exp.toLocaleString()); $('#sum-balance').text((inc-exp).toLocaleString());
+            
+            $('#summary-highlights').html(`
+                <div class="col-md-4"><div class="summary-box bg-income"><h6>Total Income</h6><h3>${inc.toLocaleString()}</h3></div></div>
+                <div class="col-md-4"><div class="summary-box bg-expense"><h6>Total Expenses</h6><h3>${exp.toLocaleString()}</h3></div></div>
+                <div class="col-md-4"><div class="summary-box bg-balance"><h6>Grand Balance</h6><h3>${(inc-exp).toLocaleString()}</h3></div></div>
+                ${tehHtml}
+            `);
         }
 
         function applyFilters() {
