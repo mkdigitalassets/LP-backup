@@ -128,9 +128,10 @@
 
                 <div id="data-list-container">
                     <div id="filter-container" class="row g-2 mb-4 no-print border rounded p-3 bg-light mx-0">
-                        <div class="col-md-4"><select id="filter-tehsil" class="form-select form-select-sm"></select></div>
-                        <div class="col-md-3"><input type="date" id="filter-from" class="form-control form-control-sm"></div>
-                        <div class="col-md-3"><input type="date" id="filter-to" class="form-control form-control-sm"></div>
+                        <div class="col-md-3"><select id="filter-tehsil" class="form-select form-select-sm"></select></div>
+                        <div class="col-md-3"><input type="text" id="filter-name" class="form-control form-control-sm" placeholder="Search by Name/Detail..."></div>
+                        <div class="col-md-2"><input type="date" id="filter-from" class="form-control form-control-sm"></div>
+                        <div class="col-md-2"><input type="date" id="filter-to" class="form-control form-control-sm"></div>
                         <div class="col-md-2"><button class="btn btn-sm btn-primary w-100" id="filter-btn">Filter</button></div>
                     </div>
                     <div class="table-responsive">
@@ -259,6 +260,16 @@
         }
 
         function renderTable(data) {
+            const nameSearch = $('#filter-name').val().toLowerCase().trim();
+            if(nameSearch) {
+                data = data.filter(i => {
+                    const desc = String(i.Description || "").toLowerCase();
+                    const mName = String(i.ManagerName || "").toLowerCase();
+                    const macName = String(i.MachinaryName || "").toLowerCase();
+                    return desc.includes(nameSearch) || mName.includes(nameSearch) || macName.includes(nameSearch);
+                });
+            }
+
             if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center py-4'>No Data found.</td></tr>"); return; }
             let headers = Object.keys(data[0]).filter(h => !['rowNum', 'Category', 'ID', 'Password'].includes(h));
             $('#table-head').html(`<tr>${headers.map(h => `<th>${h === 'Description' && currentCategory === 'Managers' ? 'Manager Name' : h}</th>`).join('')}<th class="no-print">Actions</th></tr>`);
@@ -289,9 +300,20 @@
 
         function generateFinalReport() {
             const teh = $('#filter-tehsil').val(), from = $('#filter-from').val(), to = $('#filter-to').val();
+            const nameSearch = $('#filter-name').val().toLowerCase().trim();
             let data = allData.filter(i => !['Tehsils', 'Managers', 'Machinary'].includes(i.Category));
             
             if(teh) data = data.filter(i => i.ParentTehsil === teh);
+            
+            if(nameSearch) {
+                data = data.filter(i => {
+                    const mName = String(i.ManagerName || "").toLowerCase();
+                    const macName = String(i.MachinaryName || "").toLowerCase();
+                    const desc = String(i.Description || "").toLowerCase();
+                    return mName.includes(nameSearch) || macName.includes(nameSearch) || desc.includes(nameSearch);
+                });
+            }
+
             if(from || to) {
                 data = data.filter(i => {
                     if(!i.Date) return false;
@@ -301,7 +323,7 @@
             }
 
             let inc = 0, exp = 0;
-            let tehStats = {}; // To hold tehsil wise calculations
+            let tehStats = {}; 
 
             $('#table-head').html(`<tr><th>Date</th><th>Category</th><th>Details</th><th>Tehsil</th><th>Debit (Exp)</th><th>Credit (Inc)</th></tr>`);
             
@@ -316,14 +338,13 @@
                 return `<tr>
                     <td>${row.Date ? row.Date.split('T')[0] : '-'}</td>
                     <td><span class="badge ${isInc?'bg-success':'bg-danger'}">${row.Category}</span></td>
-                    <td>${row.ManagerName || row.MachinaryName || ''} ${row.Description}</td>
+                    <td><strong>${row.ManagerName || row.MachinaryName || ''}</strong> ${row.Description}</td>
                     <td>${tName}</td>
                     <td class="text-danger">${!isInc?amt.toLocaleString():'-'}</td>
                     <td class="text-success">${isInc?amt.toLocaleString():'-'}</td>
                 </tr>`;
             }).join('');
 
-            // Build Tehsil Summary Cards
             let tehHtml = `<div class="col-12 mt-4 mb-2"><h5 class="fw-bold border-bottom pb-2">Tehsil Summary (Income - Expenses)</h5></div>`;
             for (let t in tehStats) {
                 let bal = tehStats[t].income - tehStats[t].expense;
