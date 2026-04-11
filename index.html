@@ -151,7 +151,7 @@
                             <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-to').val('').trigger('change')">Reset To</a>
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-sm btn-outline-secondary w-100 h-100" onclick="resetAllFilters()">RESET ALL</button>
+                            <button class="btn btn-sm btn-outline-secondary w-100" style="height: 38px;" onclick="resetAllFilters()">RESET ALL</button>
                         </div>
                     </div>
 
@@ -223,17 +223,26 @@
         }
 
         function openCategory(name) {
-            currentCategory = name; toggleView('list'); resetAllFilters();
-            $('#summary-highlights').hide(); $('#action-buttons button:first-child').show();
-            $('#home-section').removeClass('active-section'); $('#category-section').addClass('active-section');
-            $('#current-title').text(name); $('#category-type').val(name);
+            currentCategory = name; toggleView('list');
             
+            // Filters UI Reset
+            $('#filter-tehsil, #filter-manager, #filter-machinery').val('').trigger('change.select2');
+            $('#filter-from, #filter-to').val('');
+
+            $('#summary-highlights').hide(); 
+            $('#action-buttons button:first-child').show();
+            $('#home-section').removeClass('active-section'); 
+            $('#category-section').addClass('active-section');
+            $('#current-title').text(name); 
+            $('#category-type').val(name);
+            
+            // Dynamic Form Fields
             $('#manager-select-group').toggle(name === 'ManagerExpenses' && currentUser.role === 'admin');
             $('#password-group').toggle(name === 'Managers');
             $('#machinary-select-group').toggle(name === 'MachinaryExpenses');
             $('#tehsil-select-group').toggle(name !== 'Tehsils');
 
-            // Toggle Filters based on category
+            // Dynamic Filters Visibility
             $('#filter-mgr-box').toggle(['ManagerExpenses', 'Income', 'Salary'].includes(name));
             $('#filter-mac-box').toggle(['MachinaryExpenses', 'Income'].includes(name));
             
@@ -246,9 +255,11 @@
         }
 
         function openFinalReport() {
-            currentCategory = "FinalReport"; toggleView('list'); resetAllFilters();
+            currentCategory = "FinalReport"; toggleView('list');
+            resetAllFilters();
             $('#current-title').text("Consolidated Final Report");
-            $('#home-section').removeClass('active-section'); $('#category-section').addClass('active-section');
+            $('#home-section').removeClass('active-section'); 
+            $('#category-section').addClass('active-section');
             $('#summary-highlights, #filter-container, #filter-mgr-box, #filter-mac-box').show(); 
             $('#action-buttons button:first-child').hide();
             fetchListData();
@@ -257,72 +268,77 @@
         function fetchListData() {
             $('#table-body').html("<tr><td colspan='10' class='text-center py-5'><div class='spinner-grow text-primary'></div></td></tr>");
             fetch(scriptURL).then(res => res.json()).then(data => {
-                allData = data; updateDropdowns();
+                allData = data; 
+                updateDropdowns();
                 applyFilters();
             });
         }
 
         function resetAllFilters() {
-    // Sab dropdowns aur dates ko khali karna
-    $('#filter-tehsil, #filter-manager, #filter-machinery').val('').trigger('change.select2');
-    $('#filter-from, #filter-to').val('');
-    
-    // Sab clear karne ke baad table ko refresh karna taake pura data show ho
-    applyFilters(); 
-}
+            // Values clear karein
+            $('#filter-tehsil, #filter-manager, #filter-machinery').val('').trigger('change.select2');
+            $('#filter-from, #filter-to').val('');
+            // UI ko update karne ke liye dobara call karein
+            applyFilters();
+        }
 
-// applyFilters function ko bhi thoda mazeed behtar kiya hai taake reset pe ye phanse na
-function applyFilters() {
-    if(currentCategory === "FinalReport") {
-        generateFinalReport();
-        return;
-    }
+        function applyFilters() {
+            if(currentCategory === "FinalReport") {
+                generateFinalReport();
+                return;
+            }
 
-    let filtered = allData.filter(i => i.Category === currentCategory);
-    
-    if(currentUser.role === 'manager' && currentCategory === 'ManagerExpenses') {
-        filtered = filtered.filter(i => i.ManagerName === currentUser.name);
-    }
+            let filtered = allData.filter(i => i.Category === currentCategory);
+            
+            // Security check for managers
+            if(currentUser.role === 'manager' && currentCategory === 'ManagerExpenses') {
+                filtered = filtered.filter(i => i.ManagerName === currentUser.name);
+            }
 
-    const teh = $('#filter-tehsil').val();
-    const mgr = $('#filter-manager').val();
-    const mac = $('#filter-machinery').val();
-    const from = $('#filter-from').val();
-    const to = $('#filter-to').val();
+            const teh = $('#filter-tehsil').val();
+            const mgr = $('#filter-manager').val();
+            const mac = $('#filter-machinery').val();
+            const from = $('#filter-from').val();
+            const to = $('#filter-to').val();
 
-    // Filtering logic
-    if(teh) filtered = filtered.filter(i => i.ParentTehsil === teh);
-    if(mgr) filtered = filtered.filter(i => i.ManagerName === mgr);
-    if(mac) filtered = filtered.filter(i => i.MachinaryName === mac);
-    
-    if(from || to) {
-        filtered = filtered.filter(i => {
-            if(!i.Date) return false;
-            const d = new Date(i.Date).setHours(0,0,0,0);
-            const s = from ? new Date(from).setHours(0,0,0,0) : null;
-            const e = to ? new Date(to).setHours(0,0,0,0) : null;
-            return (!s || d >= s) && (!e || d <= e);
-        });
-    }
-    
-    // Ab ye function hamesha updated filtered data ke saath table banayega
-    renderTable(filtered);
-}
+            if(teh) filtered = filtered.filter(i => i.ParentTehsil === teh);
+            if(mgr) filtered = filtered.filter(i => i.ManagerName === mgr);
+            if(mac) filtered = filtered.filter(i => i.MachinaryName === mac);
+            
+            if(from || to) {
+                filtered = filtered.filter(i => {
+                    if(!i.Date) return false;
+                    const d = new Date(i.Date).setHours(0,0,0,0);
+                    const s = from ? new Date(from).setHours(0,0,0,0) : null;
+                    const e = to ? new Date(to).setHours(0,0,0,0) : null;
+                    return (!s || d >= s) && (!e || d <= e);
+                });
+            }
+            renderTable(filtered);
+        }
 
         function renderTable(data) {
-            if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center py-4'>No Data found.</td></tr>"); return; }
+            if (!data.length) { 
+                $('#table-body').html("<tr><td colspan='10' class='text-center py-4 text-muted'>No matching records found.</td></tr>"); 
+                return; 
+            }
+            
             let headers = Object.keys(data[0]).filter(h => !['rowNum', 'Category', 'ID', 'Password'].includes(h));
             $('#table-head').html(`<tr>${headers.map(h => `<th>${h === 'Description' && currentCategory === 'Managers' ? 'Manager Name' : h}</th>`).join('')}<th class="no-print">Actions</th></tr>`);
+            
             let total = 0, rowsHtml = data.map(row => {
                 if(row.Amount) total += parseFloat(row.Amount);
                 return `<tr>${headers.map(h => `<td>${h === 'Date' && row[h] ? row[h].split('T')[0] : (row[h] || '-')}</td>`).join('')}<td class="no-print"><button class="btn btn-sm btn-outline-primary me-1" onclick='editRecord(${JSON.stringify(row)})'><i class="fas fa-pen"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteRecord(${row.rowNum})"><i class="fas fa-trash"></i></button></td></tr>`;
             }).join('');
-            if(total > 0) rowsHtml += `<tr class="table-success fw-bold"><td>TOTAL</td><td colspan="10">${total.toLocaleString()}</td></tr>`;
+            
+            if(total > 0) {
+                rowsHtml += `<tr class="table-info fw-bold"><td>TOTAL</td><td colspan="${headers.length - 1}">${total.toLocaleString()}</td><td class="no-print"></td></tr>`;
+            }
             $('#table-body').html(rowsHtml);
         }
 
         function deleteRecord(rowNum) {
-            if(confirm("Are you sure?")) {
+            if(confirm("Are you sure you want to delete this record?")) {
                 const fd = new FormData(); fd.append('action', 'DELETE'); fd.append('rowNum', rowNum);
                 fetch(scriptURL, { method: 'POST', body: fd }).then(() => fetchListData());
             }
@@ -331,11 +347,13 @@ function applyFilters() {
         function generateFinalReport() {
             const teh = $('#filter-tehsil').val(), mgr = $('#filter-manager').val(), mac = $('#filter-machinery').val();
             const from = $('#filter-from').val(), to = $('#filter-to').val();
+            
             let data = allData.filter(i => !['Tehsils', 'Managers', 'Machinary'].includes(i.Category));
             
             if(teh) data = data.filter(i => i.ParentTehsil === teh);
             if(mgr) data = data.filter(i => i.ManagerName === mgr);
             if(mac) data = data.filter(i => i.MachinaryName === mac);
+            
             if(from || to) {
                 data = data.filter(i => {
                     if(!i.Date) return false;
@@ -346,6 +364,7 @@ function applyFilters() {
 
             let inc = 0, exp = 0, tehStats = {}; 
             $('#table-head').html(`<tr><th>Date</th><th>Category</th><th>Details</th><th>Tehsil</th><th>Exp (Debit)</th><th>Inc (Credit)</th></tr>`);
+            
             let rows = data.map(row => {
                 let amt = parseFloat(row.Amount || 0), isInc = row.Category === 'Income', tName = row.ParentTehsil || "General";
                 if(!tehStats[tName]) tehStats[tName] = { income: 0, expense: 0 };
@@ -358,8 +377,9 @@ function applyFilters() {
                 let bal = tehStats[t].income - tehStats[t].expense;
                 tehHtml += `<div class="col-md-4 mb-3"><div class="card p-3 shadow-sm bg-tehsil-card border-0"><h6 class="fw-bold text-primary mb-1">${t}</h6><div class="d-flex justify-content-between small text-muted"><span>Inc: ${tehStats[t].income.toLocaleString()}</span><span>Exp: ${tehStats[t].expense.toLocaleString()}</span></div><div class="mt-2 pt-2 border-top d-flex justify-content-between"><strong>Balance:</strong> <strong class="${bal >=0 ? 'text-success' : 'text-danger'}">${bal.toLocaleString()}</strong></div></div></div>`;
             }
+            
             $('#table-body').html(rows || "<tr><td colspan='6' class='text-center'>No data found</td></tr>");
-            $('#summary-highlights').html(`<div class="col-md-4"><div class="summary-box bg-income"><h6>Income</h6><h3>${inc.toLocaleString()}</h3></div></div><div class="col-md-4"><div class="summary-box bg-expense"><h6>Expenses</h6><h3>${exp.toLocaleString()}</h3></div></div><div class="col-md-4"><div class="summary-box bg-balance"><h6>Grand Balance</h6><h3>${(inc-exp).toLocaleString()}</h3></div></div>${tehHtml}`);
+            $('#summary-highlights').html(`<div class="col-md-4"><div class="summary-box bg-income"><h6>Total Income</h6><h3>${inc.toLocaleString()}</h3></div></div><div class="col-md-4"><div class="summary-box bg-expense"><h6>Total Expenses</h6><h3>${exp.toLocaleString()}</h3></div></div><div class="col-md-4"><div class="summary-box bg-balance"><h6>Net Balance</h6><h3>${(inc-exp).toLocaleString()}</h3></div></div>${tehHtml}`);
         }
 
         function updateDropdowns() {
@@ -376,10 +396,37 @@ function applyFilters() {
 
         function toggleView(view) { if(view === 'form') { $('#form-container').show(); $('#data-list-container').hide(); } else { $('#form-container').hide(); $('#data-list-container').show(); } }
         function showHome() { $('#category-section').removeClass('active-section'); $('#home-section').addClass('active-section'); }
-        function prepareNewRecord() { isEditing = false; $('#dynamic-form')[0].reset(); initSelect2(); if(currentUser.role === 'manager') $('#manager-dropdown').val(currentUser.name).trigger('change'); toggleView('form'); }
-        function editRecord(data) { isEditing = true; editRowNum = data.rowNum; toggleView('form'); const f = $('#dynamic-form'); f.find('[name="ID"]').val(data.ID); f.find('[name="Description"]').val(data.Description); if(data.Amount) f.find('[name="Amount"]').val(data.Amount); if(data.Date) f.find('[name="Date"]').val(data.Date.split('T')[0]); if(data.Password) f.find('[name="Password"]').val(data.Password); $('#tehsil-dropdown').val(data.ParentTehsil).trigger('change'); $('#manager-dropdown').val(data.ManagerName).trigger('change'); $('#machinary-dropdown').val(data.MachinaryName).trigger('change'); }
+        
+        function prepareNewRecord() { 
+            isEditing = false; 
+            $('#dynamic-form')[0].reset(); 
+            initSelect2(); 
+            if(currentUser.role === 'manager') $('#manager-dropdown').val(currentUser.name).trigger('change'); 
+            toggleView('form'); 
+        }
 
-        $('#dynamic-form').on('submit', function(e) { e.preventDefault(); const btn = $('#submit-btn'); btn.prop('disabled', true).text("Saving..."); let fd = new FormData(this); if(isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); } if(currentUser.role === 'manager') fd.set('ManagerName', currentUser.name); fetch(scriptURL, { method: 'POST', body: fd }).then(() => { toggleView('list'); fetchListData(); btn.prop('disabled', false).text("SAVE RECORD"); }); });
+        function editRecord(data) { 
+            isEditing = true; editRowNum = data.rowNum; toggleView('form'); 
+            const f = $('#dynamic-form'); 
+            f.find('[name="ID"]').val(data.ID); 
+            f.find('[name="Description"]').val(data.Description); 
+            if(data.Amount) f.find('[name="Amount"]').val(data.Amount); 
+            if(data.Date) f.find('[name="Date"]').val(data.Date.split('T')[0]); 
+            if(data.Password) f.find('[name="Password"]').val(data.Password); 
+            $('#tehsil-dropdown').val(data.ParentTehsil).trigger('change'); 
+            $('#manager-dropdown').val(data.ManagerName).trigger('change'); 
+            $('#machinary-dropdown').val(data.MachinaryName).trigger('change'); 
+        }
+
+        $('#dynamic-form').on('submit', function(e) { 
+            e.preventDefault(); 
+            const btn = $('#submit-btn'); 
+            btn.prop('disabled', true).text("Saving..."); 
+            let fd = new FormData(this); 
+            if(isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); } 
+            if(currentUser.role === 'manager') fd.set('ManagerName', currentUser.name); 
+            fetch(scriptURL, { method: 'POST', body: fd }).then(() => { toggleView('list'); fetchListData(); btn.prop('disabled', false).text("SAVE RECORD"); }); 
+        });
     </script>
 </body>
 </html>
