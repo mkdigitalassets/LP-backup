@@ -31,7 +31,6 @@
         .bg-balance { background: #3b82f6; }
         .bg-tehsil-card { background: #ffffff; border-left: 5px solid #6366f1 !important; }
 
-        /* Reset Button Styling */
         .btn-reset-filter { font-size: 0.7rem; padding: 2px 8px; margin-top: 4px; display: block; width: fit-content; text-decoration: none; color: #64748b; }
         .btn-reset-filter:hover { color: #ef4444; }
 
@@ -132,28 +131,27 @@
                 <div id="data-list-container">
                     <div id="filter-container" class="row g-2 mb-4 no-print border rounded p-3 bg-light mx-0 shadow-sm">
                         <div class="col-md-2">
-                            <select id="filter-tehsil" class="select2-bs5"></select>
+                            <select id="filter-tehsil" class="select2-bs5" onchange="applyFilters()"></select>
                             <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-tehsil').val('').trigger('change')">Reset Tehsil</a>
                         </div>
-                        <div class="col-md-2">
-                            <select id="filter-manager" class="select2-bs5"></select>
+                        <div class="col-md-2" id="filter-mgr-box">
+                            <select id="filter-manager" class="select2-bs5" onchange="applyFilters()"></select>
                             <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-manager').val('').trigger('change')">Reset Manager</a>
                         </div>
-                        <div class="col-md-2">
-                            <select id="filter-machinery" class="select2-bs5"></select>
+                        <div class="col-md-2" id="filter-mac-box">
+                            <select id="filter-machinery" class="select2-bs5" onchange="applyFilters()"></select>
                             <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-machinery').val('').trigger('change')">Reset Machine</a>
                         </div>
                         <div class="col-md-2">
-                            <input type="date" id="filter-from" class="form-control form-control-sm">
-                            <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-from').val('')">Reset From</a>
+                            <input type="date" id="filter-from" class="form-control form-control-sm" onchange="applyFilters()">
+                            <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-from').val('').trigger('change')">Reset From</a>
                         </div>
                         <div class="col-md-2">
-                            <input type="date" id="filter-to" class="form-control form-control-sm">
-                            <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-to').val('')">Reset To</a>
+                            <input type="date" id="filter-to" class="form-control form-control-sm" onchange="applyFilters()">
+                            <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-to').val('').trigger('change')">Reset To</a>
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-sm btn-primary w-100 fw-bold" id="filter-btn">APPLY FILTER</button>
-                            <button class="btn btn-sm btn-outline-secondary w-100 mt-1" onclick="resetAllFilters()">RESET ALL</button>
+                            <button class="btn btn-sm btn-outline-secondary w-100 h-100" onclick="resetAllFilters()">RESET ALL</button>
                         </div>
                     </div>
 
@@ -229,13 +227,20 @@
             $('#summary-highlights').hide(); $('#action-buttons button:first-child').show();
             $('#home-section').removeClass('active-section'); $('#category-section').addClass('active-section');
             $('#current-title').text(name); $('#category-type').val(name);
-            $('#filter-btn').attr('onclick', 'applyFilters()');
+            
             $('#manager-select-group').toggle(name === 'ManagerExpenses' && currentUser.role === 'admin');
             $('#password-group').toggle(name === 'Managers');
             $('#machinary-select-group').toggle(name === 'MachinaryExpenses');
             $('#tehsil-select-group').toggle(name !== 'Tehsils');
+
+            // Toggle Filters based on category
+            $('#filter-mgr-box').toggle(['ManagerExpenses', 'Income', 'Salary'].includes(name));
+            $('#filter-mac-box').toggle(['MachinaryExpenses', 'Income'].includes(name));
+            
             const isEntry = !['Tehsils', 'Managers', 'Machinary'].includes(name);
-            $('#filter-container, #amount-group, #date-group').toggle(isEntry);
+            $('#filter-container').toggle(isEntry);
+            $('#amount-group, #date-group').toggle(isEntry);
+            
             $('#label-desc').text(name === 'Managers' ? "Manager Name" : (name === 'Machinary' ? "Machinery Name" : (name === 'Salary' ? "Employee Name" : "Description")));
             fetchListData();
         }
@@ -244,8 +249,8 @@
             currentCategory = "FinalReport"; toggleView('list'); resetAllFilters();
             $('#current-title').text("Consolidated Final Report");
             $('#home-section').removeClass('active-section'); $('#category-section').addClass('active-section');
-            $('#summary-highlights, #filter-container').show(); $('#action-buttons button:first-child').hide();
-            $('#filter-btn').attr('onclick', 'generateFinalReport()');
+            $('#summary-highlights, #filter-container, #filter-mgr-box, #filter-mac-box').show(); 
+            $('#action-buttons button:first-child').hide();
             fetchListData();
         }
 
@@ -253,12 +258,7 @@
             $('#table-body').html("<tr><td colspan='10' class='text-center py-5'><div class='spinner-grow text-primary'></div></td></tr>");
             fetch(scriptURL).then(res => res.json()).then(data => {
                 allData = data; updateDropdowns();
-                if(currentCategory === "FinalReport") generateFinalReport();
-                else {
-                    let filtered = data.filter(i => i.Category === currentCategory);
-                    if(currentUser.role === 'manager' && currentCategory === 'ManagerExpenses') filtered = filtered.filter(i => i.ManagerName === currentUser.name);
-                    renderTable(filtered);
-                }
+                applyFilters();
             });
         }
 
@@ -267,15 +267,37 @@
             $('#filter-from, #filter-to').val('');
         }
 
-        function renderTable(data) {
+        function applyFilters() {
+            if(currentCategory === "FinalReport") {
+                generateFinalReport();
+                return;
+            }
+
+            let filtered = allData.filter(i => i.Category === currentCategory);
+            if(currentUser.role === 'manager' && currentCategory === 'ManagerExpenses') {
+                filtered = filtered.filter(i => i.ManagerName === currentUser.name);
+            }
+
             const teh = $('#filter-tehsil').val();
             const mgr = $('#filter-manager').val();
             const mac = $('#filter-machinery').val();
+            const from = $('#filter-from').val();
+            const to = $('#filter-to').val();
 
-            if(teh) data = data.filter(i => i.ParentTehsil === teh);
-            if(mgr) data = data.filter(i => i.ManagerName === mgr);
-            if(mac) data = data.filter(i => i.MachinaryName === mac);
+            if(teh) filtered = filtered.filter(i => i.ParentTehsil === teh);
+            if(mgr) filtered = filtered.filter(i => i.ManagerName === mgr);
+            if(mac) filtered = filtered.filter(i => i.MachinaryName === mac);
+            if(from || to) {
+                filtered = filtered.filter(i => {
+                    if(!i.Date) return false;
+                    const d = new Date(i.Date).setHours(0,0,0,0), s = from ? new Date(from).setHours(0,0,0,0) : null, e = to ? new Date(to).setHours(0,0,0,0) : null;
+                    return (!s || d >= s) && (!e || d <= e);
+                });
+            }
+            renderTable(filtered);
+        }
 
+        function renderTable(data) {
             if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center py-4'>No Data found.</td></tr>"); return; }
             let headers = Object.keys(data[0]).filter(h => !['rowNum', 'Category', 'ID', 'Password'].includes(h));
             $('#table-head').html(`<tr>${headers.map(h => `<th>${h === 'Description' && currentCategory === 'Managers' ? 'Manager Name' : h}</th>`).join('')}<th class="no-print">Actions</th></tr>`);
@@ -327,8 +349,6 @@
             $('#table-body').html(rows || "<tr><td colspan='6' class='text-center'>No data found</td></tr>");
             $('#summary-highlights').html(`<div class="col-md-4"><div class="summary-box bg-income"><h6>Income</h6><h3>${inc.toLocaleString()}</h3></div></div><div class="col-md-4"><div class="summary-box bg-expense"><h6>Expenses</h6><h3>${exp.toLocaleString()}</h3></div></div><div class="col-md-4"><div class="summary-box bg-balance"><h6>Grand Balance</h6><h3>${(inc-exp).toLocaleString()}</h3></div></div>${tehHtml}`);
         }
-
-        function applyFilters() { renderTable(allData.filter(i => i.Category === currentCategory)); }
 
         function updateDropdowns() {
             const tehsils = allData.filter(i => i.Category === 'Tehsils'), managers = allData.filter(i => i.Category === 'Managers'), machinary = allData.filter(i => i.Category === 'Machinary');
