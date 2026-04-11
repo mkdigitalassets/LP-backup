@@ -31,8 +31,12 @@
         .bg-balance { background: #3b82f6; }
         .bg-tehsil-card { background: #ffffff; border-left: 5px solid #6366f1 !important; }
 
+        /* Reset Button Styling */
+        .btn-reset-filter { font-size: 0.7rem; padding: 2px 8px; margin-top: 4px; display: block; width: fit-content; text-decoration: none; color: #64748b; }
+        .btn-reset-filter:hover { color: #ef4444; }
+
         @media print {
-            .no-print, .navbar, .btn, #form-container, #home-section, #filter-container, #login-overlay { display: none !important; }
+            .no-print, .navbar, .btn, #form-container, #home-section, #filter-container, #login-overlay, .btn-reset-filter { display: none !important; }
             .view-section { display: block !important; }
             .main-card { box-shadow: none; border: none; padding: 0; }
             table { width: 100% !important; border-collapse: collapse; }
@@ -40,7 +44,8 @@
         }
     </style>
 </head>
-<body oncontextmenu="return false;"> <div id="login-overlay">
+<body oncontextmenu="return false;"> 
+    <div id="login-overlay">
         <div class="login-box shadow-lg">
             <div class="text-center mb-4">
                 <i class="fas fa-user-lock fa-3x text-primary mb-2"></i>
@@ -67,7 +72,6 @@
     </nav>
 
     <div class="container pb-5">
-        
         <div id="home-section" class="view-section active-section">
             <div class="row g-4 text-center" id="dashboard-items"></div>
         </div>
@@ -82,8 +86,7 @@
                     </div>
                 </div>
 
-                <div id="summary-highlights" class="row g-3 no-print mb-4" style="display:none;">
-                    </div>
+                <div id="summary-highlights" class="row g-3 no-print mb-4" style="display:none;"></div>
 
                 <div id="form-container" class="mb-5 no-print p-4 border rounded-3 bg-white shadow-sm" style="display:none; border-top: 4px solid #22c55e !important;">
                     <form id="dynamic-form">
@@ -127,13 +130,33 @@
                 </div>
 
                 <div id="data-list-container">
-                    <div id="filter-container" class="row g-2 mb-4 no-print border rounded p-3 bg-light mx-0">
-                        <div class="col-md-3"><select id="filter-tehsil" class="form-select form-select-sm"></select></div>
-                        <div class="col-md-3"><input type="text" id="filter-name" class="form-control form-control-sm" placeholder="Search by Name/Detail..."></div>
-                        <div class="col-md-2"><input type="date" id="filter-from" class="form-control form-control-sm"></div>
-                        <div class="col-md-2"><input type="date" id="filter-to" class="form-control form-control-sm"></div>
-                        <div class="col-md-2"><button class="btn btn-sm btn-primary w-100" id="filter-btn">Filter</button></div>
+                    <div id="filter-container" class="row g-2 mb-4 no-print border rounded p-3 bg-light mx-0 shadow-sm">
+                        <div class="col-md-2">
+                            <select id="filter-tehsil" class="select2-bs5"></select>
+                            <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-tehsil').val('').trigger('change')">Reset Tehsil</a>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="filter-manager" class="select2-bs5"></select>
+                            <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-manager').val('').trigger('change')">Reset Manager</a>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="filter-machinery" class="select2-bs5"></select>
+                            <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-machinery').val('').trigger('change')">Reset Machine</a>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" id="filter-from" class="form-control form-control-sm">
+                            <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-from').val('')">Reset From</a>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" id="filter-to" class="form-control form-control-sm">
+                            <a href="javascript:void(0)" class="btn-reset-filter" onclick="$('#filter-to').val('')">Reset To</a>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-sm btn-primary w-100 fw-bold" id="filter-btn">APPLY FILTER</button>
+                            <button class="btn btn-sm btn-outline-secondary w-100 mt-1" onclick="resetAllFilters()">RESET ALL</button>
+                        </div>
                     </div>
+
                     <div class="table-responsive">
                         <table class="table table-hover align-middle border-top">
                             <thead class="table-dark" id="table-head"></thead>
@@ -150,14 +173,10 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        // --- SECURITY SCRIPT ---
         document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false; // F12
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Inspect
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Element
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Console
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // View Source
-            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; // Save
+            if(e.keyCode == 123) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
         };
 
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwJSO8noWDGy_kpY4SZQxi4oI8B3QkrayqfoqKamd9j563Fb_szRk0IkIADHtldvLxSpg/exec';
@@ -171,32 +190,17 @@
         function handleLogin() {
             const user = $('#login-user').val().trim().toLowerCase();
             const pass = $('#login-pass').val().trim();
-
             if(user === adminUser.toLowerCase() && pass === adminPass) {
                 currentUser = { role: 'admin', name: 'Admin' };
                 startApp();
             } else {
                 $('#login-error').hide();
                 $('#login-overlay button').text("Checking...").prop('disabled', true);
-                
                 fetch(scriptURL).then(res => res.json()).then(data => {
-                    const manager = data.find(i => 
-                        i.Category === 'Managers' && 
-                        String(i.Description).toLowerCase() === user && 
-                        String(i.Password) === pass
-                    );
-
-                    if(manager) {
-                        currentUser = { role: 'manager', name: manager.Description };
-                        startApp();
-                    } else {
-                        $('#login-error').fadeIn();
-                        $('#login-overlay button').text("LOGIN").prop('disabled', false);
-                    }
-                }).catch(err => {
-                    alert("Error connecting to sheet!");
-                    $('#login-overlay button').text("LOGIN").prop('disabled', false);
-                });
+                    const manager = data.find(i => i.Category === 'Managers' && String(i.Description).toLowerCase() === user && String(i.Password) === pass);
+                    if(manager) { currentUser = { role: 'manager', name: manager.Description }; startApp(); }
+                    else { $('#login-error').fadeIn(); $('#login-overlay button').text("LOGIN").prop('disabled', false); }
+                }).catch(() => { alert("Error connecting!"); $('#login-overlay button').text("LOGIN").prop('disabled', false); });
             }
         }
 
@@ -221,12 +225,11 @@
         }
 
         function openCategory(name) {
-            currentCategory = name; toggleView('list');
+            currentCategory = name; toggleView('list'); resetAllFilters();
             $('#summary-highlights').hide(); $('#action-buttons button:first-child').show();
             $('#home-section').removeClass('active-section'); $('#category-section').addClass('active-section');
             $('#current-title').text(name); $('#category-type').val(name);
             $('#filter-btn').attr('onclick', 'applyFilters()');
-
             $('#manager-select-group').toggle(name === 'ManagerExpenses' && currentUser.role === 'admin');
             $('#password-group').toggle(name === 'Managers');
             $('#machinary-select-group').toggle(name === 'MachinaryExpenses');
@@ -238,7 +241,7 @@
         }
 
         function openFinalReport() {
-            currentCategory = "FinalReport"; toggleView('list');
+            currentCategory = "FinalReport"; toggleView('list'); resetAllFilters();
             $('#current-title').text("Consolidated Final Report");
             $('#home-section').removeClass('active-section'); $('#category-section').addClass('active-section');
             $('#summary-highlights, #filter-container').show(); $('#action-buttons button:first-child').hide();
@@ -259,61 +262,46 @@
             });
         }
 
+        function resetAllFilters() {
+            $('#filter-tehsil, #filter-manager, #filter-machinery').val('').trigger('change');
+            $('#filter-from, #filter-to').val('');
+        }
+
         function renderTable(data) {
-            const nameSearch = $('#filter-name').val().toLowerCase().trim();
-            if(nameSearch) {
-                data = data.filter(i => {
-                    const desc = String(i.Description || "").toLowerCase();
-                    const mName = String(i.ManagerName || "").toLowerCase();
-                    const macName = String(i.MachinaryName || "").toLowerCase();
-                    return desc.includes(nameSearch) || mName.includes(nameSearch) || macName.includes(nameSearch);
-                });
-            }
+            const teh = $('#filter-tehsil').val();
+            const mgr = $('#filter-manager').val();
+            const mac = $('#filter-machinery').val();
+
+            if(teh) data = data.filter(i => i.ParentTehsil === teh);
+            if(mgr) data = data.filter(i => i.ManagerName === mgr);
+            if(mac) data = data.filter(i => i.MachinaryName === mac);
 
             if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center py-4'>No Data found.</td></tr>"); return; }
             let headers = Object.keys(data[0]).filter(h => !['rowNum', 'Category', 'ID', 'Password'].includes(h));
             $('#table-head').html(`<tr>${headers.map(h => `<th>${h === 'Description' && currentCategory === 'Managers' ? 'Manager Name' : h}</th>`).join('')}<th class="no-print">Actions</th></tr>`);
-            
             let total = 0, rowsHtml = data.map(row => {
                 if(row.Amount) total += parseFloat(row.Amount);
-                return `<tr>
-                    ${headers.map(h => `<td>${h === 'Date' && row[h] ? row[h].split('T')[0] : (row[h] || '-')}</td>`).join('')}
-                    <td class="no-print">
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick='editRecord(${JSON.stringify(row)})'><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord(${row.rowNum})"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>`;
+                return `<tr>${headers.map(h => `<td>${h === 'Date' && row[h] ? row[h].split('T')[0] : (row[h] || '-')}</td>`).join('')}<td class="no-print"><button class="btn btn-sm btn-outline-primary me-1" onclick='editRecord(${JSON.stringify(row)})'><i class="fas fa-pen"></i></button><button class="btn btn-sm btn-outline-danger" onclick="deleteRecord(${row.rowNum})"><i class="fas fa-trash"></i></button></td></tr>`;
             }).join('');
-            
             if(total > 0) rowsHtml += `<tr class="table-success fw-bold"><td>TOTAL</td><td colspan="10">${total.toLocaleString()}</td></tr>`;
             $('#table-body').html(rowsHtml);
         }
 
         function deleteRecord(rowNum) {
-            if(confirm("Are you sure you want to delete this record?")) {
-                const fd = new FormData();
-                fd.append('action', 'DELETE');
-                fd.append('rowNum', rowNum);
+            if(confirm("Are you sure?")) {
+                const fd = new FormData(); fd.append('action', 'DELETE'); fd.append('rowNum', rowNum);
                 fetch(scriptURL, { method: 'POST', body: fd }).then(() => fetchListData());
             }
         }
 
         function generateFinalReport() {
-            const teh = $('#filter-tehsil').val(), from = $('#filter-from').val(), to = $('#filter-to').val();
-            const nameSearch = $('#filter-name').val().toLowerCase().trim();
+            const teh = $('#filter-tehsil').val(), mgr = $('#filter-manager').val(), mac = $('#filter-machinery').val();
+            const from = $('#filter-from').val(), to = $('#filter-to').val();
             let data = allData.filter(i => !['Tehsils', 'Managers', 'Machinary'].includes(i.Category));
             
             if(teh) data = data.filter(i => i.ParentTehsil === teh);
-            
-            if(nameSearch) {
-                data = data.filter(i => {
-                    const mName = String(i.ManagerName || "").toLowerCase();
-                    const macName = String(i.MachinaryName || "").toLowerCase();
-                    const desc = String(i.Description || "").toLowerCase();
-                    return mName.includes(nameSearch) || macName.includes(nameSearch) || desc.includes(nameSearch);
-                });
-            }
-
+            if(mgr) data = data.filter(i => i.ManagerName === mgr);
+            if(mac) data = data.filter(i => i.MachinaryName === mac);
             if(from || to) {
                 data = data.filter(i => {
                     if(!i.Date) return false;
@@ -322,95 +310,44 @@
                 });
             }
 
-            let inc = 0, exp = 0;
-            let tehStats = {}; 
-
-            $('#table-head').html(`<tr><th>Date</th><th>Category</th><th>Details</th><th>Tehsil</th><th>Debit (Exp)</th><th>Credit (Inc)</th></tr>`);
-            
+            let inc = 0, exp = 0, tehStats = {}; 
+            $('#table-head').html(`<tr><th>Date</th><th>Category</th><th>Details</th><th>Tehsil</th><th>Exp (Debit)</th><th>Inc (Credit)</th></tr>`);
             let rows = data.map(row => {
-                let amt = parseFloat(row.Amount || 0), isInc = row.Category === 'Income';
-                let tName = row.ParentTehsil || "General";
-
+                let amt = parseFloat(row.Amount || 0), isInc = row.Category === 'Income', tName = row.ParentTehsil || "General";
                 if(!tehStats[tName]) tehStats[tName] = { income: 0, expense: 0 };
-                if(isInc) { inc += amt; tehStats[tName].income += amt; } 
-                else { exp += amt; tehStats[tName].expense += amt; }
-
-                return `<tr>
-                    <td>${row.Date ? row.Date.split('T')[0] : '-'}</td>
-                    <td><span class="badge ${isInc?'bg-success':'bg-danger'}">${row.Category}</span></td>
-                    <td><strong>${row.ManagerName || row.MachinaryName || ''}</strong> ${row.Description}</td>
-                    <td>${tName}</td>
-                    <td class="text-danger">${!isInc?amt.toLocaleString():'-'}</td>
-                    <td class="text-success">${isInc?amt.toLocaleString():'-'}</td>
-                </tr>`;
+                if(isInc) { inc += amt; tehStats[tName].income += amt; } else { exp += amt; tehStats[tName].expense += amt; }
+                return `<tr><td>${row.Date ? row.Date.split('T')[0] : '-'}</td><td><span class="badge ${isInc?'bg-success':'bg-danger'}">${row.Category}</span></td><td><strong>${row.ManagerName || row.MachinaryName || ''}</strong> ${row.Description}</td><td>${tName}</td><td class="text-danger">${!isInc?amt.toLocaleString():'-'}</td><td class="text-success">${isInc?amt.toLocaleString():'-'}</td></tr>`;
             }).join('');
 
-            let tehHtml = `<div class="col-12 mt-4 mb-2"><h5 class="fw-bold border-bottom pb-2">Tehsil Summary (Income - Expenses)</h5></div>`;
+            let tehHtml = `<div class="col-12 mt-4 mb-2"><h5 class="fw-bold border-bottom pb-2">Tehsil Summary</h5></div>`;
             for (let t in tehStats) {
                 let bal = tehStats[t].income - tehStats[t].expense;
-                tehHtml += `
-                    <div class="col-md-4 mb-3">
-                        <div class="card p-3 shadow-sm bg-tehsil-card border-0">
-                            <h6 class="fw-bold text-primary mb-1">${t}</h6>
-                            <div class="d-flex justify-content-between small text-muted"><span>Inc: ${tehStats[t].income.toLocaleString()}</span><span>Exp: ${tehStats[t].expense.toLocaleString()}</span></div>
-                            <div class="mt-2 pt-2 border-top d-flex justify-content-between">
-                                <strong>Balance:</strong> <strong class="${bal >=0 ? 'text-success' : 'text-danger'}">${bal.toLocaleString()}</strong>
-                            </div>
-                        </div>
-                    </div>`;
+                tehHtml += `<div class="col-md-4 mb-3"><div class="card p-3 shadow-sm bg-tehsil-card border-0"><h6 class="fw-bold text-primary mb-1">${t}</h6><div class="d-flex justify-content-between small text-muted"><span>Inc: ${tehStats[t].income.toLocaleString()}</span><span>Exp: ${tehStats[t].expense.toLocaleString()}</span></div><div class="mt-2 pt-2 border-top d-flex justify-content-between"><strong>Balance:</strong> <strong class="${bal >=0 ? 'text-success' : 'text-danger'}">${bal.toLocaleString()}</strong></div></div></div>`;
             }
-
-            $('#table-body').html(rows || "<tr><td colspan='6' class='text-center'>No data for selected filters</td></tr>");
-            
-            $('#summary-highlights').html(`
-                <div class="col-md-4"><div class="summary-box bg-income"><h6>Total Income</h6><h3>${inc.toLocaleString()}</h3></div></div>
-                <div class="col-md-4"><div class="summary-box bg-expense"><h6>Total Expenses</h6><h3>${exp.toLocaleString()}</h3></div></div>
-                <div class="col-md-4"><div class="summary-box bg-balance"><h6>Grand Balance</h6><h3>${(inc-exp).toLocaleString()}</h3></div></div>
-                ${tehHtml}
-            `);
+            $('#table-body').html(rows || "<tr><td colspan='6' class='text-center'>No data found</td></tr>");
+            $('#summary-highlights').html(`<div class="col-md-4"><div class="summary-box bg-income"><h6>Income</h6><h3>${inc.toLocaleString()}</h3></div></div><div class="col-md-4"><div class="summary-box bg-expense"><h6>Expenses</h6><h3>${exp.toLocaleString()}</h3></div></div><div class="col-md-4"><div class="summary-box bg-balance"><h6>Grand Balance</h6><h3>${(inc-exp).toLocaleString()}</h3></div></div>${tehHtml}`);
         }
 
-        function applyFilters() {
-            let res = allData.filter(i => i.Category === currentCategory);
-            const teh = $('#filter-tehsil').val();
-            if(teh) res = res.filter(i => i.ParentTehsil === teh);
-            renderTable(res);
-        }
+        function applyFilters() { renderTable(allData.filter(i => i.Category === currentCategory)); }
 
         function updateDropdowns() {
             const tehsils = allData.filter(i => i.Category === 'Tehsils'), managers = allData.filter(i => i.Category === 'Managers'), machinary = allData.filter(i => i.Category === 'Machinary');
-            $('#tehsil-dropdown, #filter-tehsil').html('<option value="">Select Tehsil</option>' + tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join(''));
-            $('#manager-dropdown').html('<option value="">Select Manager</option>' + managers.map(m => `<option value="${m.Description}">${m.Description}</option>`).join(''));
-            $('#machinary-dropdown').html('<option value="">Select Machinery</option>' + machinary.map(m => `<option value="${m.Description}">${m.Description}</option>`).join(''));
+            const tehOpts = '<option value="">Select Tehsil</option>' + tehsils.map(t => `<option value="${t.Description}">${t.Description}</option>`).join('');
+            const mgrOpts = '<option value="">Select Manager</option>' + managers.map(m => `<option value="${m.Description}">${m.Description}</option>`).join('');
+            const macOpts = '<option value="">Select Machinery</option>' + machinary.map(m => `<option value="${m.Description}">${m.Description}</option>`).join('');
+            
+            $('#tehsil-dropdown, #filter-tehsil').html(tehOpts);
+            $('#manager-dropdown, #filter-manager').html(mgrOpts);
+            $('#machinary-dropdown, #filter-machinery').html(macOpts);
             initSelect2();
         }
 
         function toggleView(view) { if(view === 'form') { $('#form-container').show(); $('#data-list-container').hide(); } else { $('#form-container').hide(); $('#data-list-container').show(); } }
         function showHome() { $('#category-section').removeClass('active-section'); $('#home-section').addClass('active-section'); }
+        function prepareNewRecord() { isEditing = false; $('#dynamic-form')[0].reset(); initSelect2(); if(currentUser.role === 'manager') $('#manager-dropdown').val(currentUser.name).trigger('change'); toggleView('form'); }
+        function editRecord(data) { isEditing = true; editRowNum = data.rowNum; toggleView('form'); const f = $('#dynamic-form'); f.find('[name="ID"]').val(data.ID); f.find('[name="Description"]').val(data.Description); if(data.Amount) f.find('[name="Amount"]').val(data.Amount); if(data.Date) f.find('[name="Date"]').val(data.Date.split('T')[0]); if(data.Password) f.find('[name="Password"]').val(data.Password); $('#tehsil-dropdown').val(data.ParentTehsil).trigger('change'); $('#manager-dropdown').val(data.ManagerName).trigger('change'); $('#machinary-dropdown').val(data.MachinaryName).trigger('change'); }
 
-        function prepareNewRecord() {
-            isEditing = false; $('#dynamic-form')[0].reset(); initSelect2();
-            if(currentUser.role === 'manager') $('#manager-dropdown').val(currentUser.name).trigger('change');
-            toggleView('form');
-        }
-
-        function editRecord(data) {
-            isEditing = true; editRowNum = data.rowNum; toggleView('form');
-            const f = $('#dynamic-form'); f.find('[name="ID"]').val(data.ID); f.find('[name="Description"]').val(data.Description);
-            if(data.Amount) f.find('[name="Amount"]').val(data.Amount);
-            if(data.Date) f.find('[name="Date"]').val(data.Date.split('T')[0]);
-            if(data.Password) f.find('[name="Password"]').val(data.Password);
-            $('#tehsil-dropdown').val(data.ParentTehsil).trigger('change');
-            $('#manager-dropdown').val(data.ManagerName).trigger('change');
-            $('#machinary-dropdown').val(data.MachinaryName).trigger('change');
-        }
-
-        $('#dynamic-form').on('submit', function(e) {
-            e.preventDefault(); const btn = $('#submit-btn'); btn.prop('disabled', true).text("Saving...");
-            let fd = new FormData(this); if(isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); }
-            if(currentUser.role === 'manager') fd.set('ManagerName', currentUser.name);
-            fetch(scriptURL, { method: 'POST', body: fd }).then(() => { toggleView('list'); fetchListData(); btn.prop('disabled', false).text("SAVE RECORD"); });
-        });
+        $('#dynamic-form').on('submit', function(e) { e.preventDefault(); const btn = $('#submit-btn'); btn.prop('disabled', true).text("Saving..."); let fd = new FormData(this); if(isEditing) { fd.append('action', 'UPDATE'); fd.append('rowNum', editRowNum); } if(currentUser.role === 'manager') fd.set('ManagerName', currentUser.name); fetch(scriptURL, { method: 'POST', body: fd }).then(() => { toggleView('list'); fetchListData(); btn.prop('disabled', false).text("SAVE RECORD"); }); });
     </script>
 </body>
 </html>
