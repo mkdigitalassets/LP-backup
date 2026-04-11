@@ -263,39 +263,51 @@
         }
 
         function resetAllFilters() {
-            $('#filter-tehsil, #filter-manager, #filter-machinery').val('').trigger('change');
-            $('#filter-from, #filter-to').val('');
-        }
+    // Sab dropdowns aur dates ko khali karna
+    $('#filter-tehsil, #filter-manager, #filter-machinery').val('').trigger('change.select2');
+    $('#filter-from, #filter-to').val('');
+    
+    // Sab clear karne ke baad table ko refresh karna taake pura data show ho
+    applyFilters(); 
+}
 
-        function applyFilters() {
-            if(currentCategory === "FinalReport") {
-                generateFinalReport();
-                return;
-            }
+// applyFilters function ko bhi thoda mazeed behtar kiya hai taake reset pe ye phanse na
+function applyFilters() {
+    if(currentCategory === "FinalReport") {
+        generateFinalReport();
+        return;
+    }
 
-            let filtered = allData.filter(i => i.Category === currentCategory);
-            if(currentUser.role === 'manager' && currentCategory === 'ManagerExpenses') {
-                filtered = filtered.filter(i => i.ManagerName === currentUser.name);
-            }
+    let filtered = allData.filter(i => i.Category === currentCategory);
+    
+    if(currentUser.role === 'manager' && currentCategory === 'ManagerExpenses') {
+        filtered = filtered.filter(i => i.ManagerName === currentUser.name);
+    }
 
-            const teh = $('#filter-tehsil').val();
-            const mgr = $('#filter-manager').val();
-            const mac = $('#filter-machinery').val();
-            const from = $('#filter-from').val();
-            const to = $('#filter-to').val();
+    const teh = $('#filter-tehsil').val();
+    const mgr = $('#filter-manager').val();
+    const mac = $('#filter-machinery').val();
+    const from = $('#filter-from').val();
+    const to = $('#filter-to').val();
 
-            if(teh) filtered = filtered.filter(i => i.ParentTehsil === teh);
-            if(mgr) filtered = filtered.filter(i => i.ManagerName === mgr);
-            if(mac) filtered = filtered.filter(i => i.MachinaryName === mac);
-            if(from || to) {
-                filtered = filtered.filter(i => {
-                    if(!i.Date) return false;
-                    const d = new Date(i.Date).setHours(0,0,0,0), s = from ? new Date(from).setHours(0,0,0,0) : null, e = to ? new Date(to).setHours(0,0,0,0) : null;
-                    return (!s || d >= s) && (!e || d <= e);
-                });
-            }
-            renderTable(filtered);
-        }
+    // Filtering logic
+    if(teh) filtered = filtered.filter(i => i.ParentTehsil === teh);
+    if(mgr) filtered = filtered.filter(i => i.ManagerName === mgr);
+    if(mac) filtered = filtered.filter(i => i.MachinaryName === mac);
+    
+    if(from || to) {
+        filtered = filtered.filter(i => {
+            if(!i.Date) return false;
+            const d = new Date(i.Date).setHours(0,0,0,0);
+            const s = from ? new Date(from).setHours(0,0,0,0) : null;
+            const e = to ? new Date(to).setHours(0,0,0,0) : null;
+            return (!s || d >= s) && (!e || d <= e);
+        });
+    }
+    
+    // Ab ye function hamesha updated filtered data ke saath table banayega
+    renderTable(filtered);
+}
 
         function renderTable(data) {
             if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center py-4'>No Data found.</td></tr>"); return; }
