@@ -282,40 +282,41 @@
             applyFilters();
         }
 
-        function applyFilters() {
-            if(currentCategory === "FinalReport") {
-                generateFinalReport();
-                return;
-            }
+       function applyFilters() {
+    if(currentCategory === "FinalReport") {
+        generateFinalReport();
+        return;
+    }
 
-            let filtered = allData.filter(i => i.Category === currentCategory);
-            
-            // Security check for managers
-            if(currentUser.role === 'manager' && currentCategory === 'ManagerExpenses') {
-                filtered = filtered.filter(i => i.ManagerName === currentUser.name);
-            }
+    let filtered = allData.filter(i => i.Category === currentCategory);
+    
+    // Security check for managers
+    if(currentUser.role === 'manager' && currentCategory === 'ManagerExpenses') {
+        filtered = filtered.filter(i => i.Description === currentUser.name || i.ManagerName === currentUser.name);
+    }
 
-            const teh = $('#filter-tehsil').val();
-            const mgr = $('#filter-manager').val();
-            const mac = $('#filter-machinery').val();
-            const from = $('#filter-from').val();
-            const to = $('#filter-to').val();
+    const teh = $('#filter-tehsil').val();
+    const mgr = $('#filter-manager').val();
+    const mac = $('#filter-machinery').val();
+    const from = $('#filter-from').val();
+    const to = $('#filter-to').val();
 
-            if(teh) filtered = filtered.filter(i => i.ParentTehsil === teh);
-            if(mgr) filtered = filtered.filter(i => i.ManagerName === mgr);
-            if(mac) filtered = filtered.filter(i => i.MachinaryName === mac);
-            
-            if(from || to) {
-                filtered = filtered.filter(i => {
-                    if(!i.Date) return false;
-                    const d = new Date(i.Date).setHours(0,0,0,0);
-                    const s = from ? new Date(from).setHours(0,0,0,0) : null;
-                    const e = to ? new Date(to).setHours(0,0,0,0) : null;
-                    return (!s || d >= s) && (!e || d <= e);
-                });
-            }
-            renderTable(filtered);
-        }
+    // Filtering Logic (Added trim and null checks)
+    if(teh && teh !== "") filtered = filtered.filter(i => i.ParentTehsil === teh);
+    if(mgr && mgr !== "") filtered = filtered.filter(i => i.ManagerName === mgr);
+    if(mac && mac !== "") filtered = filtered.filter(i => i.MachinaryName === mac);
+    
+    if(from || to) {
+        filtered = filtered.filter(i => {
+            if(!i.Date) return false;
+            const d = new Date(i.Date).setHours(0,0,0,0);
+            const s = from ? new Date(from).setHours(0,0,0,0) : null;
+            const e = to ? new Date(to).setHours(0,0,0,0) : null;
+            return (!s || d >= s) && (!e || d <= e);
+        });
+    }
+    renderTable(filtered);
+}
 
         function renderTable(data) {
             if (!data.length) { 
@@ -345,42 +346,55 @@
         }
 
         function generateFinalReport() {
-            const teh = $('#filter-tehsil').val(), mgr = $('#filter-manager').val(), mac = $('#filter-machinery').val();
-            const from = $('#filter-from').val(), to = $('#filter-to').val();
-            
-            let data = allData.filter(i => !['Tehsils', 'Managers', 'Machinary'].includes(i.Category));
-            
-            if(teh) data = data.filter(i => i.ParentTehsil === teh);
-            if(mgr) data = data.filter(i => i.ManagerName === mgr);
-            if(mac) data = data.filter(i => i.MachinaryName === mac);
-            
-            if(from || to) {
-                data = data.filter(i => {
-                    if(!i.Date) return false;
-                    const d = new Date(i.Date).setHours(0,0,0,0), s = from ? new Date(from).setHours(0,0,0,0) : null, e = to ? new Date(to).setHours(0,0,0,0) : null;
-                    return (!s || d >= s) && (!e || d <= e);
-                });
-            }
+    const teh = $('#filter-tehsil').val();
+    const mgr = $('#filter-manager').val();
+    const mac = $('#filter-machinery').val();
+    const from = $('#filter-from').val();
+    const to = $('#filter-to').val();
+    
+    // Final report ke liye wo categories filter karein jin mein transactions hain
+    let data = allData.filter(i => ['Income', 'ManagerExpenses', 'MachinaryExpenses', 'Salary'].includes(i.Category));
+    
+    // Yahan Manager aur Machinery filters apply ho rahe hain
+    if(teh && teh !== "") data = data.filter(i => i.ParentTehsil === teh);
+    if(mgr && mgr !== "") data = data.filter(i => i.ManagerName === mgr);
+    if(mac && mac !== "") data = data.filter(i => i.MachinaryName === mac);
+    
+    if(from || to) {
+        data = data.filter(i => {
+            if(!i.Date) return false;
+            const d = new Date(i.Date).setHours(0,0,0,0);
+            const s = from ? new Date(from).setHours(0,0,0,0) : null;
+            const e = to ? new Date(to).setHours(0,0,0,0) : null;
+            return (!s || d >= s) && (!e || d <= e);
+        });
+    }
 
-            let inc = 0, exp = 0, tehStats = {}; 
-            $('#table-head').html(`<tr><th>Date</th><th>Category</th><th>Details</th><th>Tehsil</th><th>Exp (Debit)</th><th>Inc (Credit)</th></tr>`);
-            
-            let rows = data.map(row => {
-                let amt = parseFloat(row.Amount || 0), isInc = row.Category === 'Income', tName = row.ParentTehsil || "General";
-                if(!tehStats[tName]) tehStats[tName] = { income: 0, expense: 0 };
-                if(isInc) { inc += amt; tehStats[tName].income += amt; } else { exp += amt; tehStats[tName].expense += amt; }
-                return `<tr><td>${row.Date ? row.Date.split('T')[0] : '-'}</td><td><span class="badge ${isInc?'bg-success':'bg-danger'}">${row.Category}</span></td><td><strong>${row.ManagerName || row.MachinaryName || ''}</strong> ${row.Description}</td><td>${tName}</td><td class="text-danger">${!isInc?amt.toLocaleString():'-'}</td><td class="text-success">${isInc?amt.toLocaleString():'-'}</td></tr>`;
-            }).join('');
+    let inc = 0, exp = 0; 
+    $('#table-head').html(`<tr><th>Date</th><th>Category</th><th>Details</th><th>Tehsil</th><th>Exp (Debit)</th><th>Inc (Credit)</th></tr>`);
+    
+    let rows = data.map(row => {
+        let amt = parseFloat(row.Amount || 0);
+        let isInc = row.Category === 'Income';
+        if(isInc) inc += amt; else exp += amt;
+        
+        return `<tr>
+            <td>${row.Date ? row.Date.split('T')[0] : '-'}</td>
+            <td><span class="badge ${isInc?'bg-success':'bg-danger'}">${row.Category}</span></td>
+            <td><strong>${row.ManagerName || row.MachinaryName || ''}</strong> ${row.Description || ''}</td>
+            <td>${row.ParentTehsil || '-'}</td>
+            <td class="text-danger">${!isInc ? amt.toLocaleString() : '-'}</td>
+            <td class="text-success">${isInc ? amt.toLocaleString() : '-'}</td>
+        </tr>`;
+    }).join('');
 
-            let tehHtml = `<div class="col-12 mt-4 mb-2"><h5 class="fw-bold border-bottom pb-2">Tehsil Summary</h5></div>`;
-            for (let t in tehStats) {
-                let bal = tehStats[t].income - tehStats[t].expense;
-                tehHtml += `<div class="col-md-4 mb-3"><div class="card p-3 shadow-sm bg-tehsil-card border-0"><h6 class="fw-bold text-primary mb-1">${t}</h6><div class="d-flex justify-content-between small text-muted"><span>Inc: ${tehStats[t].income.toLocaleString()}</span><span>Exp: ${tehStats[t].expense.toLocaleString()}</span></div><div class="mt-2 pt-2 border-top d-flex justify-content-between"><strong>Balance:</strong> <strong class="${bal >=0 ? 'text-success' : 'text-danger'}">${bal.toLocaleString()}</strong></div></div></div>`;
-            }
-            
-            $('#table-body').html(rows || "<tr><td colspan='6' class='text-center'>No data found</td></tr>");
-            $('#summary-highlights').html(`<div class="col-md-4"><div class="summary-box bg-income"><h6>Total Income</h6><h3>${inc.toLocaleString()}</h3></div></div><div class="col-md-4"><div class="summary-box bg-expense"><h6>Total Expenses</h6><h3>${exp.toLocaleString()}</h3></div></div><div class="col-md-4"><div class="summary-box bg-balance"><h6>Net Balance</h6><h3>${(inc-exp).toLocaleString()}</h3></div></div>${tehHtml}`);
-        }
+    $('#table-body').html(rows || "<tr><td colspan='6' class='text-center'>No data found for these filters</td></tr>");
+    $('#summary-highlights').show().html(`
+        <div class="col-md-4"><div class="summary-box bg-income"><h6>Total Income</h6><h3>${inc.toLocaleString()}</h3></div></div>
+        <div class="col-md-4"><div class="summary-box bg-expense"><h6>Total Expenses</h6><h3>${exp.toLocaleString()}</h3></div></div>
+        <div class="col-md-4"><div class="summary-box bg-balance"><h6>Net Balance</h6><h3>${(inc-exp).toLocaleString()}</h3></div></div>
+    `);
+}
 
         function updateDropdowns() {
             const tehsils = allData.filter(i => i.Category === 'Tehsils'), managers = allData.filter(i => i.Category === 'Managers'), machinary = allData.filter(i => i.Category === 'Machinary');
