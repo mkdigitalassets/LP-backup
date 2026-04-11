@@ -156,43 +156,42 @@
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwJSO8noWDGy_kpY4SZQxi4oI8B3QkrayqfoqKamd9j563Fb_szRk0IkIADHtldvLxSpg/exec';
         let currentUser = { role: '', name: '' }, allData = [], currentCategory = "";
         const adminUser = "admin", adminPass = "12345";
+        let isEditing = false, editRowNum = null;
 
         $(document).ready(initSelect2);
         function initSelect2() { $('.select2-bs5').select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Select' }); }
 
         function handleLogin() {
-    const user = $('#login-user').val().trim().toLowerCase(); // user input ko clean kiya
-    const pass = $('#login-pass').val().trim();
+            const user = $('#login-user').val().trim().toLowerCase();
+            const pass = $('#login-pass').val().trim();
 
-    if(user === adminUser.toLowerCase() && pass === adminPass) {
-        currentUser = { role: 'admin', name: 'Admin' };
-        startApp();
-    } else {
-        $('#login-error').hide();
-        // Loader dikhayen jab tak check ho raha ho
-        $('#login-overlay button').text("Checking...").prop('disabled', true);
-        
-        fetch(scriptURL).then(res => res.json()).then(data => {
-            // Sheet mein manager dhundna (case insensitive)
-            const manager = data.find(i => 
-                i.Category === 'Managers' && 
-                String(i.Description).toLowerCase() === user && 
-                String(i.Password) === pass
-            );
-
-            if(manager) {
-                currentUser = { role: 'manager', name: manager.Description };
+            if(user === adminUser.toLowerCase() && pass === adminPass) {
+                currentUser = { role: 'admin', name: 'Admin' };
                 startApp();
             } else {
-                $('#login-error').fadeIn();
-                $('#login-overlay button').text("LOGIN").prop('disabled', false);
+                $('#login-error').hide();
+                $('#login-overlay button').text("Checking...").prop('disabled', true);
+                
+                fetch(scriptURL).then(res => res.json()).then(data => {
+                    const manager = data.find(i => 
+                        i.Category === 'Managers' && 
+                        String(i.Description).toLowerCase() === user && 
+                        String(i.Password) === pass
+                    );
+
+                    if(manager) {
+                        currentUser = { role: 'manager', name: manager.Description };
+                        startApp();
+                    } else {
+                        $('#login-error').fadeIn();
+                        $('#login-overlay button').text("LOGIN").prop('disabled', false);
+                    }
+                }).catch(err => {
+                    alert("Error connecting to sheet!");
+                    $('#login-overlay button').text("LOGIN").prop('disabled', false);
+                });
             }
-        }).catch(err => {
-            alert("Error connecting to sheet!");
-            $('#login-overlay button').text("LOGIN").prop('disabled', false);
-        });
-    }
-}
+        }
 
         function startApp() { $('#login-overlay').fadeOut(); renderDashboard(); fetchListData(); }
 
@@ -257,12 +256,31 @@
             if (!data.length) { $('#table-body').html("<tr><td colspan='10' class='text-center py-4'>No Data found.</td></tr>"); return; }
             let headers = Object.keys(data[0]).filter(h => !['rowNum', 'Category', 'ID', 'Password'].includes(h));
             $('#table-head').html(`<tr>${headers.map(h => `<th>${h === 'Description' && currentCategory === 'Managers' ? 'Manager Name' : h}</th>`).join('')}<th class="no-print">Actions</th></tr>`);
+            
             let total = 0, rowsHtml = data.map(row => {
                 if(row.Amount) total += parseFloat(row.Amount);
-                return `<tr>${headers.map(h => `<td>${h === 'Date' ? row[h].split('T')[0] : (row[h] || '-')}</td>`).join('')}<td class="no-print"><button class="btn btn-sm btn-outline-primary" onclick='editRecord(${JSON.stringify(row)})'><i class="fas fa-pen"></i></button></td></tr>`;
+                return `<tr>
+                    ${headers.map(h => `<td>${h === 'Date' && row[h] ? row[h].split('T')[0] : (row[h] || '-')}</td>`).join('')}
+                    <td class="no-print">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick='editRecord(${JSON.stringify(row)})'><i class="fas fa-pen"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord(${row.rowNum})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
             }).join('');
+            
             if(total > 0) rowsHtml += `<tr class="table-success fw-bold"><td>TOTAL</td><td colspan="10">${total.toLocaleString()}</td></tr>`;
             $('#table-body').html(rowsHtml);
+        }
+
+        function deleteRecord(rowNum) {
+            if(confirm("Are you sure you want to delete this record?")) {
+                const btn = event.target.closest('button');
+                btn.disabled = true;
+                const fd = new FormData();
+                fd.append('action', 'DELETE');
+                fd.append('rowNum', rowNum);
+                fetch(scriptURL, { method: 'POST', body: fd }).then(() => fetchListData());
+            }
         }
 
         function generateFinalReport() {
